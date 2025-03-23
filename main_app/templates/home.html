@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>
+    {% if user.is_authenticated %}
+      Welcome, {{ user.username }}!
+    {% else %}
+      Welcome to MyCocktail!
+    {% endif %}
+  </h2>
+
+  <h3>Shared Cocktails</h3>
+  <ul>
+    {% if shared_cocktails %}
+      {% for cocktail in shared_cocktails %}
+        <li>
+          <h4>{{ cocktail.name }}</h4>
+          <p>{{ cocktail.description }}</p>
+          <img src="{{ cocktail.image }}" alt="{{ cocktail.name }}" width="200">
+        </li>
+      {% endfor %}
+    {% else %}
+      <li>No shared cocktails available.</li>
+    {% endif %}
+  </ul>
+{% endblock %}

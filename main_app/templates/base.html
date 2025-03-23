@@ -14,15 +14,20 @@
   <body>
     <header>
       <div class="header-logo-container">
-        <h1>MyCocktail</h1>
+        <h1><a href="/">MyCocktail</a></h1>
       </div>
       <nav>
         <ul>
             <li><a href="/browse">Browse</a></li>
             <li><a href="/about">About</a></li>
-            <li><a href="/login">Login</a></li>
-            <li><a href="/signup">Sign up</a></li>
-            <li><a href="/logout">Logout</a></li>
+
+            {% if user.is_authenticated %}
+                <!-- Display 'Logout' if user is authenticated -->
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <!-- Display 'Login' and 'Sign up' if user is not authenticated -->
+                <li><a href="/login">Login</a></li>
+            {% endif %}
         </ul>
       </nav>
     </header>

@@ -63,7 +63,12 @@ cocktails = [
 
 # Home view
 def home(request):
-    return HttpResponse('<h1>Hello ᓚᘏᗢ</h1>')
+    # Get shared cocktails (if you are using a model, modify this to query the database)
+    shared_cocktails = [cocktail for cocktail in cocktails if cocktail["shared"]]  # Modify this based on your models
+    
+    return render(request, 'home.html', {
+        'shared_cocktails': shared_cocktails
+    })
 
 # About view
 def about(request):
