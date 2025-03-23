@@ -14,7 +14,7 @@
     </div>
   {% endif %}
 
-  <form method="post" autocomplete="off">
+  <form method="post" action="{% url 'login' %}" autocomplete="off">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Login</button>

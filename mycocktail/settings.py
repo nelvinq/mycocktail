@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 AUTH_USER_MODEL = 'main_app.User'
 
 MIDDLEWARE = [
@@ -128,3 +130,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = 'cocktail-index'

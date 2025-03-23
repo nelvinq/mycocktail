@@ -1,60 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.db import models
-from django.db.models import Q
-from .forms import SignUpForm, LoginForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from .forms import SignUpForm, LoginForm
 
-def home(request):
-    return HttpResponse('<h1>Hello ᓚᘏᗢ</h1>')
-
-def about(request):
-    return render(request, 'about.html')
-
-def cocktail_index(request):
-    if request.user.is_authenticated:
-        print(f"User {request.user.username} is logged in.")
-    else:
-        print("No user is logged in.")
-    return render(request, 'cocktails/index.html', {'cocktails': cocktails})
-
-def signup_view(request):
-    if request.method == "POST":
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # Auto-login after signup
-            return redirect('cocktail-index')  # Change 'home' to your homepage
-    else:
-        form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
-
-# Login View
-def login_view(request):
-    if request.method == "POST":
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            
-            if user is not None:
-                login(request, user)
-                messages.success(request, "Successfully logged in!")
-                return redirect('cocktail-index')  # Redirect after successful login
-            else:
-                messages.error(request, "Invalid credentials. Please try again.")
-    else:
-        form = LoginForm()
-    
-    return render(request, 'login.html', {'form': form})
-
-# Logout View
-def logout_view(request):
-    logout(request)
-    return redirect('login')
-
+# Your existing cocktail data
 cocktails = [
     {
         "name": "Margarita",
@@ -74,8 +25,8 @@ cocktails = [
         "category": "Classic",
         "glassType": "Classic",
         "alcoholic": True,
-        "creator": "user_123",  # This would be a foreign key to User model
-        "likes": ["user_456", "user_789"],  # ForeignKey to users who liked the cocktail
+        "creator": "user_123",
+        "likes": ["user_456", "user_789"],
         "shared": True,
         "comments": [
             {"user": "user_101", "text": "Great flavor, one of my favorites!", "created_at": "2025-03-20T08:00:00"}
@@ -109,3 +60,42 @@ cocktails = [
         "updatedAt": "2025-03-20T09:00:00"
     }
 ]
+
+# Home view
+def home(request):
+    return HttpResponse('<h1>Hello ᓚᘏᗢ</h1>')
+
+# About view
+def about(request):
+    return render(request, 'about.html')
+
+# Cocktail index view
+def cocktail_index(request):
+    if request.user.is_authenticated:
+        print(f"User {request.user.username} is logged in.")
+    else:
+        print("No user is logged in.")
+    shared_cocktails = [cocktail for cocktail in cocktails if cocktail["shared"]]
+    return render(request, 'cocktails/index.html', {'cocktails': shared_cocktails})
+
+# Signup view
+def signup_view(request):
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Auto-login after signup
+            return redirect('cocktail-index')  # Change 'home' to your homepage
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+# Use the built-in LoginView for login
+class CustomLoginView(LoginView):
+    template_name = 'login.html'  # You can change this to your custom template
+    form_class = LoginForm
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
