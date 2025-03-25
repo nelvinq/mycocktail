@@ -20,6 +20,13 @@
           <img src="{% static 'images/MyCocktailLogo-White.png' %}" alt="MyCocktail Logo" class="logo">
         </a>
       </div>
+      <div class="welcome-user">
+      <h2>
+        {% if user.is_authenticated %}
+          Welcome, {{ user.username }}!
+        {% endif %}
+      </h2>
+      </div>
       <nav>
         <ul>
             <li><a href="/browse">Browse</a></li>

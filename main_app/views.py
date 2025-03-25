@@ -2,16 +2,17 @@ import os
 import mimetypes
 import json
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, LoginForm, CocktailForm
+from .forms import SignUpForm, AuthenticationForm, CocktailForm, LoginForm
 from .models import Cocktail, Ingredient
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.urls import reverse_lazy
 from supabase import create_client
 
 
@@ -162,10 +163,26 @@ def signup_view(request):
 
 # Use the built-in LoginView for login
 class CustomLoginView(LoginView):
-    template_name = 'login.html'  # You can change this to your custom template
+    template_name = 'login.html'  # Make sure the path is correct
     form_class = LoginForm
 
+    def form_valid(self, form):
+        # Return to the usual page when login is successful
+        return super().form_valid(form)
 
+    def form_invalid(self, form):
+        # Handling invalid login
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        
+        if user is None:
+            # If no user is found with these credentials, add an error
+            messages.error(self.request, "Invalid credentials. Please try again.")
+
+        # Return the form with errors back to the page
+        return self.render_to_response(self.get_context_data(form=form))
+        
 def logout_view(request):
     logout(request)
     return redirect('home')

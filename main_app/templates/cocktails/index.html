@@ -9,12 +9,23 @@
 
     <!-- Link to the CSS file -->
     <link rel="stylesheet" href="{% static 'css/cocktail-index.css' %}">
+    <style>
+      .card-title {
+          display: -webkit-box;
+          -webkit-line-clamp: 2; 
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-height: 2.5em; 
+          max-height: 5em;
+          line-height: 1.25em;
+      }
+  </style>
 </head>
 <body>
 
 {% block content %}
 <section class="page-header">
-  <h1>Shared Cocktails</h1>
 </section>
 
 <section class="card-container">
@@ -31,8 +42,8 @@
         <h2 class="card-title">{{ cocktail.name }}</h2>
         <p><small>{{ cocktail.description }}</small></p>
         <p><strong>Category:</strong> {{ cocktail.category }}</p>
-        <p><strong>Glass Type:</strong> {{ cocktail.glass_type }}</p>
         <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
+        <p><strong>Created by:</strong> {{ cocktail.creator }}</p>
       </div>
     </div>
   {% empty %}

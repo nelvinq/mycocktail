@@ -19,6 +19,16 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get("username")
+        password = cleaned_data.get("password")
+
+        # Add custom validation if necessary
+        if not username or not password:
+            raise ValidationError("Both username and password are required.")
+        return cleaned_data
+
 class CocktailForm(forms.ModelForm):
     # Fields for Cocktail details
     name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Cocktail Name'}))

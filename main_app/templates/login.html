@@ -3,7 +3,6 @@
 {% block content %}
   <h2>Login</h2>
 
-  <!-- Display error messages -->
   {% if messages %}
     <div class="messages">
       {% for message in messages %}
@@ -16,7 +15,7 @@
 
   <form method="post" action="{% url 'login' %}" autocomplete="off">
     {% csrf_token %}
-    <!-- Your login form fields -->
+    <!-- Login form fields -->
     <label for="username">Username:</label>
     <input type="text" name="username" required>
 
@@ -25,6 +24,9 @@
 
     <button type="submit">Login</button>
   </form>
+  <!-- Display error messages -->
+
+
 
   <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
 {% endblock %}

@@ -57,11 +57,12 @@ body {
   margin: 10px 0;
   font-size: var(--font-xl);
   font-weight: bold;
+  color: white;
 }
 
 .card p {
+  font-size: 1.3em;
   margin: 5px 0;
-  font-size: var(--font-reg);
 }
 
 .card > a {
