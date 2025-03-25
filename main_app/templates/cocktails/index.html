@@ -1,11 +1,8 @@
-{% extends 'base.html' %} 
-{% load static %} 
-{% block head %}
-{% endblock %} 
-{% block content %}
+{% load static %}
 
+{% block content %}
 <section class="page-header">
-  <h1>Cocktail List</h1>
+  <h1>Shared Cocktails</h1>
 </section>
 
 <section class="card-container">
@@ -13,11 +10,21 @@
     <div class="card">
       <div class="card-content">
         <div class="card-img-container">
+          {% if cocktail.image_url %}
+            <img src="{{ cocktail.image_url }}" alt="{{ cocktail.name }}" class="card-img">
+          {% else %}
+            <img src="{% static 'images/default-cocktail.jpg' %}" alt="Default Cocktail" class="card-img">
+          {% endif %}
         </div>
         <h2 class="card-title">{{ cocktail.name }}</h2>
         <p><small>{{ cocktail.description }}</small></p>
+        <p><strong>Category:</strong> {{ cocktail.category }}</p>
+        <p><strong>Glass Type:</strong> {{ cocktail.glass_type }}</p>
+        <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
       </div>
     </div>
+  {% empty %}
+    <p>No shared cocktails available.</p>
   {% endfor %}
 </section>
 

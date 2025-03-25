@@ -1,3 +1,6 @@
+import os
+import mimetypes
+import json
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import login, authenticate, logout
@@ -6,73 +9,24 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LoginForm, CocktailForm
 from .models import Cocktail, Ingredient
-import json
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from supabase import create_client
 
-# Your existing cocktail data
-cocktails = [
-    {
-        "name": "Margarita",
-        "description": "A classic cocktail with a tangy lime kick.",
-        "ingredients": [
-            {"name": "Tequila", "amount": "2 oz"},
-            {"name": "Triple sec", "amount": "1 oz"},
-            {"name": "Lime juice", "amount": "1 oz"},
-            {"name": "Salt", "amount": "For rim"}
-        ],
-        "steps": [
-            "Rim the glass with salt.",
-            "Shake the tequila, triple sec, and lime juice with ice.",
-            "Strain into the glass and garnish with a lime wedge."
-        ],
-        "image": "https://example.com/images/margarita.jpg",
-        "category": "Classic",
-        "glassType": "Classic",
-        "alcoholic": True,
-        "creator": "user_123",
-        "likes": ["user_456", "user_789"],
-        "shared": True,
-        "comments": [
-            {"user": "user_101", "text": "Great flavor, one of my favorites!", "created_at": "2025-03-20T08:00:00"}
-        ],
-        "createdAt": "2025-03-18T08:00:00",
-        "updatedAt": "2025-03-20T08:00:00"
-    },
-    {
-        "name": "Pina Colada",
-        "description": "A tropical cocktail made with rum, coconut cream, and pineapple juice.",
-        "ingredients": [
-            {"name": "Rum", "amount": "2 oz"},
-            {"name": "Coconut cream", "amount": "1 oz"},
-            {"name": "Pineapple juice", "amount": "3 oz"}
-        ],
-        "steps": [
-            "Blend the rum, coconut cream, and pineapple juice with ice.",
-            "Serve in a tall glass with a pineapple slice garnish."
-        ],
-        "image": "https://example.com/images/pina_colada.jpg",
-        "category": "Tropical",
-        "glassType": "Tropical",
-        "alcoholic": True,
-        "creator": "user_124",
-        "likes": ["user_100", "user_111"],
-        "shared": False,
-        "comments": [
-            {"user": "user_201", "text": "Perfect drink for summer!", "created_at": "2025-03-19T12:00:00"}
-        ],
-        "createdAt": "2025-03-15T09:00:00",
-        "updatedAt": "2025-03-20T09:00:00"
-    }
-]
+
+# Initialize Supabase Client
+supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 # Home view
 def home(request):
-    # Get shared cocktails (if you are using a model, modify this to query the database)
-    shared_cocktails = [cocktail for cocktail in cocktails if cocktail["shared"]]  # Modify this based on your models
-    
-    return render(request, 'home.html', {
-        'shared_cocktails': shared_cocktails
-    })
+    shared_cocktails = Cocktail.objects.filter(shared=True)  # Reuse the same query
+    return render(request, 'home.html', {'cocktails': shared_cocktails})
+
+# Browse view
+def browse(request):
+    shared_cocktails = Cocktail.objects.filter(shared=True)
+    return render(request, 'cocktails/browse.html', {'cocktails': shared_cocktails})
 
 # About view
 def about(request):
@@ -106,6 +60,32 @@ def create_cocktail(request):
             if isinstance(steps, str):  
                 steps = [steps] 
 
+            # Handle Image Upload
+            image_url = None
+            if "image" in request.FILES:
+                image = request.FILES["image"]  # InMemoryUploadedFile
+                
+                # Generate unique file path for storage
+                file_path = f"cocktail_images/{request.user.username}/{image.name}"
+
+                # Read file content and determine MIME type
+                file_content = image.read()
+                content_type = mimetypes.guess_type(image.name)[0] or "application/octet-stream"
+
+                try:
+                    # Upload to Supabase Storage
+                    res = supabase.storage.from_("cocktail-images").upload(
+                        path=file_path,
+                        file=file_content,
+                        file_options={"content-type": content_type}
+                    )
+
+                    # Get Public URL of uploaded image
+                    image_url = supabase.storage.from_("cocktail-images").get_public_url(file_path)
+
+                except Exception as e:
+                    return JsonResponse({"error": f"Failed to upload image: {str(e)}"}, status=400)
+
             # Create the cocktail instance
             cocktail = Cocktail.objects.create(
                 name=name,
@@ -115,7 +95,8 @@ def create_cocktail(request):
                 alcoholic=alcoholic,
                 shared=shared,
                 steps=steps,
-                creator=request.user  # Assign the creator
+                creator=request.user,  # Assign the creator
+                image_url=image_url,
             )
 
             # Process and save ingredients
@@ -161,13 +142,10 @@ def create_cocktail(request):
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
+
 # Cocktail index view
 def cocktail_index(request):
-    if request.user.is_authenticated:
-        print(f"User {request.user.username} is logged in.")
-    else:
-        print("No user is logged in.")
-    shared_cocktails = [cocktail for cocktail in cocktails if cocktail["shared"]]
+    shared_cocktails = Cocktail.objects.filter(shared=True)
     return render(request, 'cocktails/index.html', {'cocktails': shared_cocktails})
 
 # Signup view
@@ -177,7 +155,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # Auto-login after signup
-            return redirect('cocktail-index')  # Change 'home' to your homepage
+            return redirect('browse')  # Change 'home' to your homepage
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})

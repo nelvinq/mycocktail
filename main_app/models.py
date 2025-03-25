@@ -122,7 +122,7 @@ class Cocktail(models.Model):
     description = models.TextField(null=True, blank=True)
     ingredients = models.ManyToManyField(Ingredient)  # Many-to-many relationship
     steps = models.JSONField()  # Array of steps (assuming JSONField for steps)
-    image = models.ImageField(null=True, blank=True)
+    image_url = models.URLField(blank=True, null=True)  # Store image URL
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     glass_type = models.CharField(max_length=20, choices=GLASS_TYPE_CHOICES)
     alcoholic = models.BooleanField(default=True)
