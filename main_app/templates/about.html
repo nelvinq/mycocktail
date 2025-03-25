@@ -1,19 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyCocktail</title>
-</head>
-<body>
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-<h1>About MyCocktail</h1>
-<hr />
-<p class="page-content">
-  I like long romantic walks down the produce aisle. Also, I am currently job
-  seeking!
-</p>
+<div>
+    <h1>About MyCocktail</h1>
+    <hr />
+    <div class="page-content">
+        <p>Welcome to <strong>MyCocktail</strong> – the ultimate app for cocktail lovers, mixologists, and anyone who enjoys experimenting with drinks! Whether you're a seasoned bartender or a home enthusiast, MyCocktail is designed to help you discover, create, and share cocktail recipes like never before.</p>
+        <p>Whether you're hosting a party or just want to try something new, MyCocktail has everything you need to craft the perfect drink. Join the community, unleash your creativity, and elevate your mixology skills with <strong>MyCocktail</strong>! Cheers! 🥂🍸</p>
+    </div>
+</div>
 {% endblock %}
-</body>
-</html>

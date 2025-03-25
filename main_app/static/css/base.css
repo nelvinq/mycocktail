@@ -147,9 +147,14 @@ nav ul li .button:hover {
 }
 
 .page-content {
-  font-size: var(--font-reg);
+  width: 90%;  /* Sets the width of the content */
+  margin: 0 auto;  /* Centers the content horizontally */
+  padding: 20px;  /* Adds some space inside the container */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Light shadow for a sleek look */
+  border-radius: 8px;  /* Rounded corners */
+  margin-top: 20px;  /* Adds space above the content */
+  font-size: 1.2em;
 }
-
 
 /* Form Container */
 .form-container {
