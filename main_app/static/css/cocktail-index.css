@@ -1,25 +1,67 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.page-header {
+  text-align: center;
+  padding: 20px;
+}
+
+.page-header h1 {
+  font-size: var(--font-xxl);
+  margin: 0;
+}
+
 .card-container {
-  padding: 0 30px;
+  padding: 0 10px;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  gap: 1px; /* Adds space between cards */
 }
 
 .card {
-  width: 275px;
-  margin: 10px;
+  width: 200px;
+  margin: 5px;
   border: var(--borders);
   box-shadow: var(--card-box-shadow);
+  border-radius: var(--card-border-radius); /* Rounded corners for the card */
+  overflow: hidden; /* Prevents images from spilling outside the card */
+  background-color: var(--bg-color); /* Keeps card background consistent with theme */
 }
 
 .card-content {
-  padding: 10px;
-  width: 100%;
+  padding: 15px;
+  text-align: left;
 }
 
-.usr-img {
+.card-img-container {
   width: 100%;
-  border-radius: var(--card-border-radius);
+  height: 200px; /* Fixed height for the images */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures images cover the area without distortion */
+}
+
+.card-title {
+  margin: 10px 0;
+  font-size: var(--font-xl);
+  font-weight: bold;
+}
+
+.card p {
+  margin: 5px 0;
+  font-size: var(--font-reg);
 }
 
 .card > a {
@@ -27,12 +69,17 @@
   color: var(--text-color);
 }
 
-.card h2 {
-  margin: 10px 0;
-  font-size: var(--font-xl);
-}
+@media only screen and (max-width: 768px) {
+  .card-container {
+    padding: 0 10px;
+  }
 
-.card p {
-  margin: 5px 0;
-  font-size: var(--font-reg);
+  .card {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .card-img-container {
+    height: 150px; /* Adjust image height for smaller screens */
+  }
 }

@@ -1,5 +1,17 @@
 {% load static %}
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Cocktails</title>
+
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="{% static 'css/cocktail-index.css' %}">
+</head>
+<body>
+
 {% block content %}
 <section class="page-header">
   <h1>Shared Cocktails</h1>
@@ -29,3 +41,6 @@
 </section>
 
 {% endblock %}
+
+</body>
+</html>
