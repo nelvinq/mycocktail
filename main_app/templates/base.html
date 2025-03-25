@@ -32,8 +32,10 @@
       </nav>
     </header>
     <main>
-     {% block content %} 
-     {% endblock %}
-     </main>
+      {% block content %} 
+      {% endblock %}
+
+      {% include 'cocktails/cocktail_modal.html' %}
+    </main>
   </body>
 </html>

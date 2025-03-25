@@ -10,4 +10,5 @@ urlpatterns = [
     path('signup/', views.signup_view, name='signup'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', logout_view, name='logout'),
+    path('create-cocktail/', views.create_cocktail, name='create_cocktail'),
     ]

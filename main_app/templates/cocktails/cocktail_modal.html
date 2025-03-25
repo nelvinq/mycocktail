@@ -1,0 +1,302 @@
+<!-- templates/components/cocktail_modal.html -->
+
+{% if user.is_authenticated %}
+<button id="openModalBtn">Create Cocktail</button>
+{% endif %}
+
+<!-- Cocktail Modal -->
+<div id="cocktailModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Create a New Cocktail</h3>
+
+    <form id="cocktailForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <label for="name">Cocktail Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="description">Description:</label>
+      <textarea id="description" name="description"></textarea>
+
+      <label for="category">Category:</label>
+      <select id="category" name="category">
+        <option value="Classic">Classic Cocktails</option>
+        <option value="Tropical">Tropical Cocktails</option>
+        <option value="Signature">Signature Cocktails</option>
+        <option value="Modern">Modern Cocktails</option>
+        <option value="Frozen">Frozen Cocktails</option>
+        <option value="Highball">Highball Cocktails</option>
+        <option value="Lowball">Lowball / Rocks Cocktails</option>
+        <option value="Sours">Sours</option>
+        <option value="Punch">Punch Cocktails</option>
+        <option value="Shots">Shots</option>
+        <option value="Martini">Martinis</option>
+        <option value="Champagne">Champagne & Sparkling Cocktails</option>
+        <option value="Mocktail">Mocktails</option>
+      </select>
+
+      <label for="glass_type">Glass Type:</label>
+      <select id="glass_type" name="glass_type">
+        <option value="Bowl">Bowl</option>
+        <option value="Champagne Flute">Champagne Flute</option>
+        <option value="Cocktail Glass">Cocktail Glass</option>
+        <option value="Collins Glass">Collins Glass</option>
+        <option value="Copper mug">Copper mug</option>
+        <option value="Coupe">Coupe</option>
+        <option value="Cup">Cup</option>
+        <option value="Goblet">Goblet</option>
+        <option value="Highball Glass">Highball Glass</option>
+        <option value="Hurricane Glass">Hurricane Glass</option>
+        <option value="Irish Coffee Glass">Irish Coffee Glass</option>
+        <option value="Margarita Glass">Margarita Glass</option>
+        <option value="Nick and Nora">Nick and Nora</option>
+        <option value="Pitcher">Pitcher</option>
+        <option value="Pub Glass">Pub Glass</option>
+        <option value="Rocks Glass">Rocks Glass</option>
+        <option value="Shooter">Shooter</option>
+        <option value="Snifter">Snifter</option>
+        <option value="Tiki">Tiki</option>
+        <option value="Wine Glass">Wine Glass</option>
+      </select>
+
+      <label for="alcoholic">Alcoholic:</label>
+      <input type="checkbox" id="alcoholic" name="alcoholic" checked>
+
+      <label for="shared">Share to Public:</label>
+      <input type="checkbox" id="shared" name="shared" checked>
+
+      <label for="image">Upload Image:</label>
+      <input type="file" id="image" name="image">
+
+      <!-- Ingredients Section -->
+      <h4>Ingredients</h4>
+      <ul id="ingredients-list" class="sortable">
+        <!-- Ingredients will be added dynamically -->
+      </ul>
+      <button type="button" id="addIngredientBtn">+ Add Ingredient</button>
+
+      <!-- Steps Section -->
+      <h4>Steps</h4>
+      <ul id="steps-list" class="sortable">
+        <!-- Steps will be added dynamically -->
+      </ul>
+      <button type="button" id="addStepBtn">+ Add Step</button>
+
+      <button type="submit">Save Cocktail</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("cocktailModal");
+    const openModalBtn = document.getElementById("openModalBtn");
+    const closeModalBtn = document.querySelector(".close");
+
+    openModalBtn.onclick = function () {
+      modal.style.display = "flex";
+    };
+
+    closeModalBtn.onclick = function () {
+      modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+
+    // Ingredient List Management
+    const ingredientsList = document.getElementById("ingredients-list");
+    const addIngredientBtn = document.getElementById("addIngredientBtn");
+
+    addIngredientBtn.addEventListener("click", function () {
+      const li = document.createElement("li");
+      li.className = "sortable-item";
+      li.innerHTML = `
+        <input type="text" name="ingredients_name[]" placeholder="Ingredient Name" required>
+        
+        <input type="text" name="ingredients_amount[]" placeholder="Amount" required>
+        
+        <select name="ingredients_unit[]" required>
+          <option value="oz">Ounce (oz)</option>
+          <option value="tbsp">Tablespoon (tbsp)</option>
+          <option value="tsp">Teaspoon (tsp)</option>
+          <option value="cup">Cup</option>
+          <option value="ml">Milliliter (ml)</option>
+          <option value="cl">Centiliter (cl)</option>
+          <option value="liter">Liter</option>
+          <option value="pinch">Pinch</option>
+          <option value="dash">Dash</option>
+          <option value="slice">Slice</option>
+          <option value="whole">Whole</option>
+          <option value="drop">Drop</option>
+          <option value="none">None</option>
+        </select>
+        
+        <label for="garnish">Garnish:</label>
+        <input type="checkbox" name="ingredients_garnish[]">
+        
+        <label for="optional">Optional:</label>
+        <input type="checkbox" name="ingredients_optional[]">
+        
+        <button type="button" class="remove-btn">✖</button>
+      `;
+      ingredientsList.appendChild(li);
+    });
+
+    // Steps List Management
+    const stepsList = document.getElementById("steps-list");
+    const addStepBtn = document.getElementById("addStepBtn");
+
+    addStepBtn.addEventListener("click", function () {
+      const li = document.createElement("li");
+      li.className = "sortable-item";
+      li.innerHTML = `
+        <input type="text" name="steps[]" placeholder="Step description" required>
+        <button type="button" class="remove-btn">✖</button>
+      `;
+      stepsList.appendChild(li);
+    });
+
+    // Remove Item (for Ingredients & Steps)
+    document.addEventListener("click", function (e) {
+      if (e.target.classList.contains("remove-btn")) {
+        e.target.parentElement.remove();
+      }
+    });
+
+    // Enable Drag & Drop Sorting
+    new Sortable(ingredientsList, { animation: 150 });
+    new Sortable(stepsList, { animation: 150 });
+
+    // Form Submit via AJAX
+    document.getElementById("cocktailForm").addEventListener("submit", function (event) {
+      event.preventDefault();  // Prevent default form submission
+
+      let formData = new FormData();
+
+      // Add non-file fields (like name, description, etc.)
+      formData.append("name", document.getElementById("name").value);
+      formData.append("description", document.getElementById("description").value);
+      formData.append("category", document.getElementById("category").value);
+      formData.append("glass_type", document.getElementById("glass_type").value);
+      formData.append("alcoholic", document.getElementById("alcoholic").checked);
+
+      // Add the uploaded image file
+      const imageFile = document.getElementById("image").files[0];
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
+      // Collect steps
+      document.querySelectorAll("#steps-list .sortable-item input").forEach((stepInput) => {
+        formData.append("steps[]", stepInput.value);
+      });
+
+      // Collect ingredients
+      document.querySelectorAll("#ingredients-list .sortable-item").forEach((ingredientRow) => {
+        let ingredientName = ingredientRow.querySelector("input[name^='ingredients_name']").value;
+        let ingredientAmount = ingredientRow.querySelector("input[name^='ingredients_amount']").value;
+        let ingredientUnit = ingredientRow.querySelector("select[name^='ingredients_unit']").value;
+        formData.append("ingredients_name[]", ingredientName);
+        formData.append("ingredients_amount[]", ingredientAmount);
+        formData.append("ingredients_unit[]", ingredientUnit);
+        formData.append("ingredients_garnish[]", ingredientRow.querySelector("input[name^='ingredients_garnish']").checked);
+        formData.append("ingredients_optional[]", ingredientRow.querySelector("input[name^='ingredients_optional']").checked);
+      });
+
+      // Send the data via fetch API with FormData
+      fetch("/create-cocktail/", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCSRFToken() // CSRF protection
+        },
+        body: formData // Send FormData object
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            alert("Cocktail Created Successfully!");
+            window.location.reload();
+          } else {
+            alert("Error: " + data.error);
+          }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+      return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
+  })
+</script>
+
+
+<style>
+  /* Modal Styling */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 800px;
+    max-height: 80vh;
+    /* Limit height to 80% of viewport */
+    overflow-y: auto;
+    /* Enable scrolling if content exceeds height */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .close {
+    cursor: pointer;
+    float: right;
+    font-size: 20px;
+  }
+
+  .sortable {
+    list-style: none;
+    padding: 0;
+  }
+
+  .sortable-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    margin: 5px 0;
+    cursor: grab;
+  }
+
+  .sortable-item input {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+
+  .remove-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+  }
+</style>
