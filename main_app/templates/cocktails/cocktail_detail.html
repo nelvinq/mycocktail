@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1>{{ cocktail.name }}</h1>
+    {% if cocktail.image %}
+        <img src="{{ cocktail.image.url }}" alt="{{ cocktail.name }}" style="max-width: 300px;">
+    {% endif %}
+    {% if cocktail.image %}
+        <img src="{{ cocktail.image.url }}" alt="{{ cocktail.name }}" style="max-width: 300px;">
+    {% endif %}
+    
+    <p><strong>Description:</strong> {{ cocktail.description }}</p>
+    
+    <p><strong>Category:</strong> {{ cocktail.category }}</p>
+    
+    <p><strong>Glass Type:</strong> {{ cocktail.glass_type }}</p>
+    
+    <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
+    
+    <p><strong>Shared to Public:</strong> {% if cocktail.shared %} Yes {% else %} No {% endif %}</p>
+    
+    <p><strong>Ingredients:</strong></p>
+    <ul>
+        {% for ingredient in cocktail.ingredients.all %}
+            <li>{{ ingredient.name }} - {{ ingredient.amount }} {{ ingredient.unit }}
+                {% if ingredient.garnish %}(Garnish){% endif %}
+                {% if ingredient.optional %}(Optional){% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <p><strong>Instructions:</strong></p>
+    <ol>
+        {% for step in cocktail.steps.all %}
+            <li>{{ step }}</li>
+        {% endfor %}
+    </ol>
+    {% if request.user == cocktail.creator %}
+
+    <!-- Edit Button Triggers Modal -->
+    <a href="#" class="btn btn-primary" id="openEditModalBtn" data-cocktail="{{ cocktail_json|escapejs }}">Edit Cocktail</a> <!-- Modal trigger -->
+    <a href="{% url 'delete_cocktail' cocktail.id %}" class="btn btn-danger">Delete Cocktail</a>
+    
+    {% endif %}
+
+
+<!-- Edit Cocktail Modal -->
+<div id="editCocktailModal" class="modal">
+    <div class="modal-content">
+      <span id="closeEditModal" class="close">&times;</span>
+      <h3>Edit Cocktail</h3>
+  
+      <form id="editCocktailForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" id="cocktailId" name="id">  <!-- Hidden field for the cocktail ID -->
+  
+        <label for="name">Cocktail Name:</label>
+        <input type="text" id="name" name="name" required>
+  
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"></textarea>
+  
+        <label for="category">Category:</label>
+        <select id="category" name="category">
+          <option value="Classic">Classic Cocktails</option>
+          <option value="Tropical">Tropical Cocktails</option>
+          <option value="Signature">Signature Cocktails</option>
+          <option value="Modern">Modern Cocktails</option>
+          <option value="Frozen">Frozen Cocktails</option>
+          <option value="Highball">Highball Cocktails</option>
+          <option value="Lowball">Lowball / Rocks Cocktails</option>
+          <option value="Sours">Sours</option>
+          <option value="Punch">Punch Cocktails</option>
+          <option value="Shots">Shots</option>
+          <option value="Martini">Martinis</option>
+          <option value="Champagne">Champagne & Sparkling Cocktails</option>
+          <option value="Mocktail">Mocktails</option>
+        </select>
+  
+        <label for="glass_type">Glass Type:</label>
+        <select id="glass_type" name="glass_type">
+          <option value="Bowl">Bowl</option>
+          <option value="Champagne Flute">Champagne Flute</option>
+          <option value="Cocktail Glass">Cocktail Glass</option>
+          <option value="Collins Glass">Collins Glass</option>
+          <option value="Copper mug">Copper mug</option>
+          <option value="Coupe">Coupe</option>
+          <option value="Cup">Cup</option>
+          <option value="Goblet">Goblet</option>
+          <option value="Highball Glass">Highball Glass</option>
+          <option value="Hurricane Glass">Hurricane Glass</option>
+          <option value="Irish Coffee Glass">Irish Coffee Glass</option>
+          <option value="Margarita Glass">Margarita Glass</option>
+          <option value="Nick and Nora">Nick and Nora</option>
+          <option value="Pitcher">Pitcher</option>
+          <option value="Pub Glass">Pub Glass</option>
+          <option value="Rocks Glass">Rocks Glass</option>
+          <option value="Shooter">Shooter</option>
+          <option value="Snifter">Snifter</option>
+          <option value="Tiki">Tiki</option>
+          <option value="Wine Glass">Wine Glass</option>
+        </select>
+  
+        <label for="alcoholic">Alcoholic:</label>
+        <input type="checkbox" id="alcoholic" name="alcoholic">
+  
+        <label for="shared">Share to Public:</label>
+        <input type="checkbox" id="shared" name="shared">
+  
+        <label for="image">Upload Image (Optional):</label>
+        <input type="file" id="image" name="image">
+  
+        <!-- Ingredients Section -->
+        <h4>Ingredients</h4>
+        <ul id="ingredients-list" class="sortable">
+          <!-- Existing ingredients will be populated here -->
+        </ul>
+        <button type="button" id="addIngredientBtn">+ Add Ingredient</button>
+  
+        <!-- Steps Section -->
+        <h4>Steps</h4>
+        <ul id="steps-list" class="sortable">
+          <!-- Existing steps will be populated here -->
+        </ul>
+        <button type="button" id="addStepBtn">+ Add Step</button>
+  
+        <button type="submit">Save Cocktail</button>
+      </form>
+    </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const modal = document.getElementById("editCocktailModal");
+      const closeModalBtn = document.querySelector(".close");
+      const editButton = document.getElementById("openEditModalBtn");
+  
+      // Open modal when Edit button is clicked
+      editButton.onclick = function () {
+        try {
+            const cocktailData = JSON.parse(editButton.getAttribute('data-cocktail'));
+            console.log(cocktailData);  // Check if cocktailData is parsed correctly
+            modal.style.display = "block";
+            populateForm(cocktailData);
+        } catch (error) {
+            console.error('Error parsing cocktail data:', error);
+        }
+        };
+      // Close modal when "X" button is clicked
+      closeModalBtn.onclick = function () {
+        modal.style.display = "none";
+      };
+  
+      // Close modal if user clicks outside of the modal
+      window.onclick = function (event) {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+  
+      // Ingredient List Management
+      const ingredientsList = document.getElementById("ingredients-list");
+      const addIngredientBtn = document.getElementById("addIngredientBtn");
+  
+      addIngredientBtn.addEventListener("click", function () {
+        const li = document.createElement("li");
+        li.className = "sortable-item";
+        li.innerHTML = `
+          <div class="ingredient-group">
+            <input type="text" name="ingredients_name[]" placeholder="Ingredient Name" class="ingredient-name" required>
+            <input type="text" name="ingredients_amount[]" placeholder="Amount" class="ingredient-amount" required>
+            <select name="ingredients_unit[]" class="ingredient-unit" required>
+              <option value="oz">Ounce (oz)</option>
+              <option value="tbsp">Tablespoon (tbsp)</option>
+              <option value="tsp">Teaspoon (tsp)</option>
+              <option value="cup">Cup</option>
+              <option value="ml">Milliliter (ml)</option>
+              <option value="cl">Centiliter (cl)</option>
+              <option value="liter">Liter</option>
+              <option value="pinch">Pinch</option>
+              <option value="dash">Dash</option>
+              <option value="slice">Slice</option>
+              <option value="whole">Whole</option>
+              <option value="drop">Drop</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+          <div class="optional-group">
+            <label for="garnish">Garnish:</label>
+            <input type="checkbox" name="ingredients_garnish[]">
+            <label for="optional">Optional:</label>
+            <input type="checkbox" name="ingredients_optional[]">
+          </div>
+          <button type="button" class="remove-btn">✖</button>
+        `;
+        ingredientsList.appendChild(li);
+      });
+  
+      // Steps List Management
+      const stepsList = document.getElementById("steps-list");
+      const addStepBtn = document.getElementById("addStepBtn");
+  
+      addStepBtn.addEventListener("click", function () {
+        const li = document.createElement("li");
+        li.className = "sortable-item";
+        li.innerHTML = `
+          <input type="text" name="steps[]" placeholder="Step description" required>
+          <button type="button" class="remove-btn">✖</button>
+        `;
+        stepsList.appendChild(li);
+      });
+  
+      // Remove Item (for Ingredients & Steps)
+      document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-btn")) {
+          e.target.parentElement.remove();
+        }
+      });
+  
+      // Enable Drag & Drop Sorting
+      new Sortable(ingredientsList, { animation: 150 });
+      new Sortable(stepsList, { animation: 150 });
+  
+      // Populate form with existing data when editing a cocktail
+      function populateForm(cocktailData) {
+        document.getElementById("cocktailId").value = cocktailData.id;
+        document.getElementById("name").value = cocktailData.name;
+        document.getElementById("description").value = cocktailData.description;
+        document.getElementById("category").value = cocktailData.category;
+        document.getElementById("glass_type").value = cocktailData.glass_type;
+        document.getElementById("alcoholic").checked = cocktailData.alcoholic;
+        document.getElementById("shared").checked = cocktailData.shared;
+  
+        // Populate Ingredients
+        cocktailData.ingredients.forEach(function (ingredient) {
+          const li = document.createElement("li");
+          li.className = "sortable-item";
+          li.innerHTML = `
+            <div class="ingredient-group">
+              <input type="text" name="ingredients_name[]" value="${ingredient.name}" required>
+              <input type="text" name="ingredients_amount[]" value="${ingredient.amount}" required>
+              <select name="ingredients_unit[]" required>
+                <option value="oz" ${ingredient.unit === 'oz' ? 'selected' : ''}>Ounce (oz)</option>
+                <option value="tbsp" ${ingredient.unit === 'tbsp' ? 'selected' : ''}>Tablespoon (tbsp)</option>
+                <option value="tsp" ${ingredient.unit === 'tsp' ? 'selected' : ''}>Teaspoon (tsp)</option>
+                <option value="cup" ${ingredient.unit === 'cup' ? 'selected' : ''}>Cup</option>
+                <option value="ml" ${ingredient.unit === 'ml' ? 'selected' : ''}>Milliliter (ml)</option>
+                <option value="cl" ${ingredient.unit === 'cl' ? 'selected' : ''}>Centiliter (cl)</option>
+                <option value="liter" ${ingredient.unit === 'liter' ? 'selected' : ''}>Liter</option>
+                <option value="pinch" ${ingredient.unit === 'pinch' ? 'selected' : ''}>Pinch</option>
+                <option value="dash" ${ingredient.unit === 'dash' ? 'selected' : ''}>Dash</option>
+                <option value="slice" ${ingredient.unit === 'slice' ? 'selected' : ''}>Slice</option>
+                <option value="whole" ${ingredient.unit === 'whole' ? 'selected' : ''}>Whole</option>
+                <option value="drop" ${ingredient.unit === 'drop' ? 'selected' : ''}>Drop</option>
+                <option value="none" ${ingredient.unit === 'none' ? 'selected' : ''}>None</option>
+              </select>
+            </div>
+            <div class="optional-group">
+              <label for="garnish">Garnish:</label>
+              <input type="checkbox" name="ingredients_garnish[]" ${ingredient.garnish ? 'checked' : ''}>
+              <label for="optional">Optional:</label>
+              <input type="checkbox" name="ingredients_optional[]" ${ingredient.optional ? 'checked' : ''}>
+            </div>
+            <button type="button" class="remove-btn">✖</button>
+          `;
+          ingredientsList.appendChild(li);
+        });
+  
+        // Populate Steps
+        cocktailData.steps.forEach(function (step) {
+          const li = document.createElement("li");
+          li.className = "sortable-item";
+          li.innerHTML = `
+            <input type="text" name="steps[]" value="${step}" required>
+            <button type="button" class="remove-btn">✖</button>
+          `;
+          stepsList.appendChild(li);
+        });
+      }
+  
+      // Example cocktail data (fetch the actual data dynamically based on your implementation)
+      const testCocktailData = {
+        id: 1,
+        name: "Mojito",
+        description: "A refreshing cocktail.",
+        category: "Classic",
+        glass_type: "Cocktail Glass",
+        alcoholic: true,
+        shared: true,
+        ingredients: [
+          { name: "Rum", amount: "2 oz", unit: "oz", garnish: true, optional: false },
+          { name: "Mint", amount: "5 leaves", unit: "none", garnish: true, optional: false },
+          { name: "Sugar", amount: "1 tsp", unit: "tsp", garnish: false, optional: true }
+        ],
+        steps: [
+          "Muddle mint leaves with sugar.",
+          "Add rum and lime juice.",
+          "Fill with soda water and stir."
+        ]
+      };
+      console.log(testCocktailData);
+    });
+  </script>
+  </body>
+  </html>
+  
+    {% endblock %}

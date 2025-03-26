@@ -141,3 +141,24 @@ class Cocktail(models.Model):
 
     def comment_count(self):
         return self.comments.count()
+        
+    def to_dict(self):
+        # Collect data into a dictionary
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'ingredients': [ingredient.name for ingredient in self.ingredients.all()],
+            'steps': self.steps,
+            'image_url': self.image_url,
+            'category': self.category,
+            'glass_type': self.glass_type,
+            'alcoholic': self.alcoholic,
+            'creator': self.creator.username,  # assuming you want the username of the creator
+            'like_count': self.like_count(),
+            'comment_count': self.comment_count(),
+            'likes': [user.username for user in self.likes.all()],
+            'comments': [comment.content for comment in self.comments.all()],
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+        }

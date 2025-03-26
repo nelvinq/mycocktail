@@ -9,9 +9,10 @@
 
     <!-- Link to the CSS file -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}" />
+
     {% block head %}{% endblock %}
 </head>
+
 <body>
 
     <header>
@@ -50,24 +51,46 @@
     <!-- JavaScript for modal functionality -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-          const modal = document.getElementById("cocktailModal");
-          const openModalBtn = document.getElementById("openModal");
-          const closeModalBtn = document.getElementById("closeModal");
-
-          if (openModalBtn && modal && closeModalBtn) {
-              openModalBtn.addEventListener("click", function (event) {
+          // Handle Create Cocktail Modal
+          const createModal = document.getElementById("cocktailModal");
+          const openCreateModalBtn = document.getElementById("openModalBtn");
+          const closeCreateModalBtn = document.getElementById("closeModal");
+    
+          if (openCreateModalBtn && createModal && closeCreateModalBtn) {
+              openCreateModalBtn.addEventListener("click", function (event) {
                   event.preventDefault();
-                  modal.style.display = "block";
+                  createModal.style.display = "block";
               });
-
-              closeModalBtn.addEventListener("click", function () {
-                  modal.style.display = "none";
+    
+              closeCreateModalBtn.addEventListener("click", function () {
+                  createModal.style.display = "none";
               });
-
-              // Close modal when clicking outside of it
+    
               window.addEventListener("click", function (event) {
-                  if (event.target === modal) {
-                      modal.style.display = "none";
+                  if (event.target === createModal) {
+                      createModal.style.display = "none";
+                  }
+              });
+          }
+    
+          // Handle Edit Cocktail Modal
+          const editModal = document.getElementById("editCocktailModal");
+          const openEditModalBtn = document.getElementById("openEditModalBtn");
+          const closeEditModalBtn = document.getElementById("closeEditModal");
+    
+          if (openEditModalBtn && editModal && closeEditModalBtn) {
+              openEditModalBtn.addEventListener("click", function (event) {
+                  event.preventDefault();
+                  editModal.style.display = "block";
+              });
+    
+              closeEditModalBtn.addEventListener("click", function () {
+                  editModal.style.display = "none";
+              });
+    
+              window.addEventListener("click", function (event) {
+                  if (event.target === editModal) {
+                      editModal.style.display = "none";
                   }
               });
           }

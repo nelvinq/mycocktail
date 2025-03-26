@@ -30,6 +30,7 @@
 <section class="card-container">
   {% for cocktail in cocktails %}
     <div class="card">
+      <a href="{% url 'cocktail_detail' cocktail.id %}"></a>
       <div class="card-content">
         <div class="card-img-container">
           {% if cocktail.image_url %}

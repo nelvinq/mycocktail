@@ -1,7 +1,7 @@
 import os
 import mimetypes
 import json
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
@@ -12,6 +12,7 @@ from .models import Cocktail, Ingredient
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core import serializers
 from django.urls import reverse_lazy
 from supabase import create_client
 
@@ -24,15 +25,21 @@ def home(request):
     shared_cocktails = Cocktail.objects.filter(shared=True)  # Reuse the same query
     return render(request, 'home.html', {'cocktails': shared_cocktails})
 
+# About view
+def about(request):
+    return render(request, 'about.html')
+
 # Browse view
 def browse(request):
     shared_cocktails = Cocktail.objects.filter(shared=True)
     return render(request, 'cocktails/browse.html', {'cocktails': shared_cocktails})
 
-# About view
-def about(request):
-    return render(request, 'about.html')
+# Cocktail index view
+def cocktail_index(request):
+    shared_cocktails = Cocktail.objects.filter(shared=True)
+    return render(request, 'cocktails/index.html', {'cocktails': shared_cocktails})
 
+# Create Cocktail
 @login_required
 def create_cocktail(request):
     if request.method == "POST":
@@ -143,11 +150,27 @@ def create_cocktail(request):
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
+# View cocktail details
+def cocktail_detail(request, cocktail_id):
+    cocktail = Cocktail.objects.get(id=cocktail_id)
+    print({cocktail.description})
+    return render(request, 'cocktails/cocktail_detail.html', {'cocktail': cocktail})
+    
+# Edit cocktail (only creator can edit)
+@login_required
+def edit_cocktail(request, cocktail_id):
+    cocktail = Cocktail.objects.get(id=cocktail_id)
+    return render(request, 'edit_cocktail_modal.html', {'cocktail': cocktail})
 
-# Cocktail index view
-def cocktail_index(request):
-    shared_cocktails = Cocktail.objects.filter(shared=True)
-    return render(request, 'cocktails/index.html', {'cocktails': shared_cocktails})
+# Delete cocktail (only creator can delete)
+@login_required
+def delete_cocktail(request, cocktail_id):
+    cocktail = get_object_or_404(Cocktail, id=cocktail_id, creator=request.user)
+    if request.method == "POST":
+        cocktail.delete()
+        return redirect('browse')  # Redirect to the cocktail list after deletion
+
+    return render(request, 'cocktails/delete_cocktail.html', {'cocktail': cocktail})
 
 # Signup view
 def signup_view(request):
@@ -182,7 +205,7 @@ class CustomLoginView(LoginView):
 
         # Return the form with errors back to the page
         return self.render_to_response(self.get_context_data(form=form))
-        
+
 def logout_view(request):
     logout(request)
     return redirect('home')
