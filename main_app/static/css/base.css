@@ -248,3 +248,10 @@ p a:hover {
   background-color: #f8d7da;
   color: #721c24;
 }
+
+/* Images */
+.detail-card-img {
+  width: 500px;
+  height: 500px;
+  object-fit: cover;
+}

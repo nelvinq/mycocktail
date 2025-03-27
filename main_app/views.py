@@ -60,13 +60,9 @@ def create_cocktail(request):
             if isinstance(alcoholic, str):  # Handle form-data case
                 alcoholic = alcoholic.lower() in ["true", "1", "yes", "on"] 
  
-            shared = data.get("shared", None)
-            if shared is not None:
-                if isinstance(shared, str):  # Only apply lower() if it's a string
-                    shared = shared.lower() in ["true", "1", "yes", "on"]
-                # If shared is already a boolean, don't apply .lower()
-            else:
-                shared = False  # Default to False if shared is not provided
+            shared = data.get("shared", True)
+            if isinstance(shared, str):  # Handle form-data case
+                shared = shared.lower() in ["true", "1", "yes", "on"] 
 
             steps_data = request.POST.getlist('steps[]')  # Get the steps from the form
             steps = [Step.objects.create(description=step_desc) for step_desc in steps_data]
@@ -158,14 +154,129 @@ def create_cocktail(request):
 # View cocktail details
 def cocktail_detail(request, cocktail_id):
     cocktail = Cocktail.objects.get(id=cocktail_id)
-    print({cocktail.description})
     return render(request, 'cocktails/cocktail_detail.html', {'cocktail': cocktail})
     
 # Edit cocktail (only creator can edit)
 @login_required
 def edit_cocktail(request, cocktail_id):
-    cocktail = Cocktail.objects.get(id=cocktail_id)
-    return render(request, 'edit_cocktail_modal.html', {'cocktail': cocktail})
+    try:
+        # Retrieve the cocktail object
+        cocktail = Cocktail.objects.get(id=cocktail_id)
+
+        if request.method == 'GET':
+            # Prepare cocktail data to return as a response
+            cocktail_data = {
+                'id': cocktail.id,
+                'name': cocktail.name,
+                'description': cocktail.description,
+                'category': cocktail.category,
+                'glass_type': cocktail.glass_type,
+                'alcoholic': cocktail.alcoholic,
+                'shared': cocktail.shared,
+                'ingredients': [
+                    {
+                        'name': ingredient.name,
+                        'amount': ingredient.amount,
+                        'unit': ingredient.unit,
+                        'garnish': ingredient.garnish,
+                        'optional': ingredient.optional
+                    } for ingredient in cocktail.ingredients.all()
+                ],
+                'steps': list(cocktail.steps.all().values_list('description', flat=True))
+            }
+            return JsonResponse({'cocktail': cocktail_data})
+        
+        elif request.method == 'POST':
+            # Get the form data sent in the POST request
+            name = request.POST.get('name')
+            description = request.POST.get('description')
+            category = request.POST.get('category')
+            glass_type = request.POST.get('glass_type')
+            alcoholic = request.POST.get('alcoholic') == 'on'
+            shared = request.POST.get('shared') == 'on'
+
+            # Handle Image Upload
+            image_url = None
+            if "image" in request.FILES:
+                image = request.FILES["image"]  # InMemoryUploadedFile
+                
+                # Generate unique file path for storage
+                file_path = f"cocktail_images/{request.user.username}/{image.name}"
+
+                # Read file content and determine MIME type
+                file_content = image.read()
+                content_type = mimetypes.guess_type(image.name)[0] or "application/octet-stream"
+
+                try:
+                    # Upload to Supabase Storage
+                    res = supabase.storage.from_("cocktail-images").upload(
+                        path=file_path,
+                        file=file_content,
+                        file_options={"content-type": content_type}
+                    )
+
+                    # Get Public URL of uploaded image
+                    image_url = supabase.storage.from_("cocktail-images").get_public_url(file_path)
+
+                except Exception as e:
+                    return JsonResponse({"error": f"Failed to upload image: {str(e)}"}, status=400)
+
+            # Handle ingredients and steps
+            ingredients_names = request.POST.getlist('ingredients_name[]')
+            ingredients_amounts = request.POST.getlist('ingredients_amount[]')
+            ingredients_units = request.POST.getlist('ingredients_unit[]')
+            ingredients_garnishes = request.POST.getlist('ingredients_garnish[]')
+            ingredients_optionals = request.POST.getlist('ingredients_optional[]')
+            steps = request.POST.getlist('steps[]')
+
+            if len(ingredients_garnishes) < len(ingredients_names):
+                ingredients_garnishes.extend([False] * (len(ingredients_names) - len(ingredients_garnishes)))
+            
+            if len(ingredients_optionals) < len(ingredients_names):
+                ingredients_optionals.extend([False] * (len(ingredients_names) - len(ingredients_optionals)))
+
+            if not (len(ingredients_names) == len(ingredients_amounts) == len(ingredients_units) == len(ingredients_garnishes) == len(ingredients_optionals)):
+                return JsonResponse({'error': 'Mismatch in ingredient data lengths'}, status=400)
+
+            # Update the cocktail object
+            cocktail.name = name
+            cocktail.description = description
+            cocktail.category = category
+            cocktail.glass_type = glass_type
+            cocktail.alcoholic = alcoholic
+            cocktail.shared = shared
+            cocktail.image_url=image_url
+
+            # Clear existing ingredients and steps, then update
+            cocktail.ingredients.clear()
+            for i in range(len(ingredients_names)):
+                garnish = ingredients_garnishes[i] if isinstance(ingredients_garnishes[i], bool) else ingredients_garnishes[i].lower() in ["true", "1", "yes", "on"]
+                optional = ingredients_optionals[i] if isinstance(ingredients_optionals[i], bool) else ingredients_optionals[i].lower() in ["true", "1", "yes", "on"]
+
+                ingredient = Ingredient.objects.create(
+                    name=ingredients_names[i],
+                    amount=ingredients_amounts[i],
+                    unit=ingredients_units[i],
+                    garnish=garnish,
+                    optional=optional,
+                )
+                cocktail.ingredients.add(ingredient)
+
+            # Clear and update the steps
+            cocktail.steps.clear()
+            for step_desc in steps:
+                step = Step.objects.create(description=step_desc)
+                cocktail.steps.add(step)
+
+            cocktail.save()  # Save the updated cocktail
+
+            return JsonResponse({'message': 'Cocktail updated successfully'}, status=200)
+
+    except Cocktail.DoesNotExist:
+        return JsonResponse({'error': 'Cocktail not found'}, status=404)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 # Delete cocktail (only creator can delete)
 @login_required

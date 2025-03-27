@@ -187,7 +187,6 @@
     // Form Submit via AJAX
     document.getElementById("cocktailForm").addEventListener("submit", function (event) {
       event.preventDefault();  // Prevent default form submission
-
       let formData = new FormData();
 
       // Add non-file fields (like name, description, etc.)
@@ -196,6 +195,7 @@
       formData.append("category", document.getElementById("category").value);
       formData.append("glass_type", document.getElementById("glass_type").value);
       formData.append("alcoholic", document.getElementById("alcoholic").checked);
+      formData.append("shared", document.getElementById("shared").checked);
 
       // Add the uploaded image file
       const imageFile = document.getElementById("image").files[0];
