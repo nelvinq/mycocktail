@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, AuthenticationForm, CocktailForm, LoginForm
-from .models import Cocktail, Ingredient
+from .models import Cocktail, Ingredient, Step
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -60,13 +60,16 @@ def create_cocktail(request):
             if isinstance(alcoholic, str):  # Handle form-data case
                 alcoholic = alcoholic.lower() in ["true", "1", "yes", "on"] 
  
-            shared = data.get("shared", True)
-            if isinstance(shared, str):  # Handle form-data case
-                shared = shared.lower() in ["true", "1", "yes", "on"] 
+            shared = data.get("shared", None)
+            if shared is not None:
+                if isinstance(shared, str):  # Only apply lower() if it's a string
+                    shared = shared.lower() in ["true", "1", "yes", "on"]
+                # If shared is already a boolean, don't apply .lower()
+            else:
+                shared = False  # Default to False if shared is not provided
 
-            steps = data.get("steps", [])           
-            if isinstance(steps, str):  
-                steps = [steps] 
+            steps_data = request.POST.getlist('steps[]')  # Get the steps from the form
+            steps = [Step.objects.create(description=step_desc) for step_desc in steps_data]
 
             # Handle Image Upload
             image_url = None
@@ -102,7 +105,6 @@ def create_cocktail(request):
                 glass_type=glass_type,
                 alcoholic=alcoholic,
                 shared=shared,
-                steps=steps,
                 creator=request.user,  # Assign the creator
                 image_url=image_url,
             )
@@ -136,6 +138,9 @@ def create_cocktail(request):
                     optional=ingredient_data.get("optional", False),
                 )
                 cocktail.ingredients.add(ingredient)
+
+            # Set the steps for the cocktail
+            cocktail.steps.set(steps) 
 
             cocktail.save()  # Save final cocktail with ingredients
 

@@ -77,6 +77,12 @@ class Ingredient(models.Model):
         garnish_str = " (Garnish)" if self.garnish else ""
         return f"{self.amount} {self.unit} of {self.name}{optional_str}{garnish_str}"
 
+# Step Model
+class Step(models.Model):
+    description = models.TextField()
+
+    def __str__(self):
+        return self.description  # Ensure it returns a string for each step
 
 # Cocktail Model
 class Cocktail(models.Model):
@@ -121,14 +127,14 @@ class Cocktail(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     ingredients = models.ManyToManyField(Ingredient)  # Many-to-many relationship
-    steps = models.JSONField()  # Array of steps (assuming JSONField for steps)
+    steps = models.ManyToManyField(Step)  # Many-to-many relationship
     image_url = models.URLField(blank=True, null=True)  # Store image URL
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     glass_type = models.CharField(max_length=20, choices=GLASS_TYPE_CHOICES)
     alcoholic = models.BooleanField(default=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_cocktails")
     likes = models.ManyToManyField(User, related_name="liked_cocktails", blank=True)  # Users who liked
-    shared = models.BooleanField(default=False)
+    shared = models.BooleanField(default=True)
     comments = models.ManyToManyField(Comment, related_name="cocktail_comments", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -149,7 +155,7 @@ class Cocktail(models.Model):
             'name': self.name,
             'description': self.description,
             'ingredients': [ingredient.name for ingredient in self.ingredients.all()],
-            'steps': self.steps,
+            'steps': [step.description for step in self.steps.all()],
             'image_url': self.image_url,
             'category': self.category,
             'glass_type': self.glass_type,
@@ -158,7 +164,7 @@ class Cocktail(models.Model):
             'like_count': self.like_count(),
             'comment_count': self.comment_count(),
             'likes': [user.username for user in self.likes.all()],
-            'comments': [comment.content for comment in self.comments.all()],
+            'comments': [comment.text for comment in self.comments.all()],
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
-        }
+        } 
