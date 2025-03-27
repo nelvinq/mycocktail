@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 <div class="container">
     <h1>{{ cocktail.name }}</h1>
-    {% if cocktail.image %}
-        <img src="{{ cocktail.image.url }}" alt="{{ cocktail.name }}" style="max-width: 300px;">
+    {% if cocktail.image_url %}
+    <img src="{{ cocktail.image_url }}" alt="{{ cocktail.name }}" class="card-img">
+    {% else %}
+      <img src="{% static 'images/default-cocktail.jpg' %}" alt="Default Cocktail" class="card-img">
     {% endif %}
-    {% if cocktail.image %}
-        <img src="{{ cocktail.image.url }}" alt="{{ cocktail.name }}" style="max-width: 300px;">
-    {% endif %}
-    
+
     <p><strong>Description:</strong> {{ cocktail.description }}</p>
     
     <p><strong>Category:</strong> {{ cocktail.category }}</p>

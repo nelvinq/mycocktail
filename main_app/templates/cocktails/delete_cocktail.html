@@ -3,10 +3,12 @@
 <div class="container">
     <h1>Delete Cocktail</h1>
     <p>Are you sure you want to delete "{{ cocktail.name }}"?</p>
-    <form method="POST">
+    <form method="POST" >
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        <a href="{% url 'cocktail_detail' cocktail.id %}" class="btn btn-secondary">Cancel</a>
+        <div class="button-container">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'cocktail_detail' cocktail.id %}" class="btn btn-danger">Cancel</a>
+        </div>
     </form>
 </div>
 {% endblock %}

@@ -185,7 +185,6 @@ button[type="submit"] {
     margin-top: 20px;
     background-color: #b70f0f;
     align-self: flex-end;
-    font-size: 1.5em;
 }
 
 button[type="submit"]:hover {
