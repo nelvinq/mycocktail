@@ -70,3 +70,11 @@ class CocktailForm(forms.ModelForm):
     # Method to clean steps (could be extended as necessary)
     def clean_steps(self):
         return [step.strip() for step in self.cleaned_data.get('steps', '').split('\n') if step.strip()]
+
+from django import forms
+from .models import Collection
+
+class CollectionForm(forms.ModelForm):
+    class Meta:
+        model = Collection
+        fields = ['name', 'description', 'shared']

@@ -7,7 +7,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, AuthenticationForm, CocktailForm, LoginForm
+from .forms import SignUpForm, AuthenticationForm, CocktailForm, LoginForm, CollectionForm
 from .models import Cocktail, Ingredient, Step
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
@@ -34,10 +34,83 @@ def browse(request):
     shared_cocktails = Cocktail.objects.filter(shared=True)
     return render(request, 'cocktails/browse.html', {'cocktails': shared_cocktails})
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Collection, Cocktail
+from .forms import CollectionForm
+
+# My Collection View
+@login_required
+def my_collections(request):
+    collections = Collection.objects.filter(createdBy=request.user)
+    return render(request, 'collections/my_collections.html', {'collections': collections})
+
+# Create Collection View
+@login_required
+def create_collection(request):
+    if request.method == "POST":
+        form = CollectionForm(request.POST)
+        if form.is_valid():
+            collection = form.save(commit=False)
+            collection.createdBy = request.user
+            collection.save()
+            return redirect('my_collections')
+    else:
+        form = CollectionForm()
+    return render(request, 'collections/create_collection.html', {'form': form})
+
+# View Collection Details
+def collection_detail(request, id):
+    collection = get_object_or_404(Collection, id=id)
+    return render(request, 'collections/collection_detail.html', {'collection': collection})
+
+# Edit Collection View
+@login_required
+def edit_collection(request, collection_id):
+    collection = get_object_or_404(Collection, id=collection_id, createdBy=request.user)
+    if request.method == "POST":
+        form = CollectionForm(request.POST, instance=collection)
+        if form.is_valid():
+            form.save()
+            return redirect('my_collections')
+    else:
+        form = CollectionForm(instance=collection)
+    return render(request, 'collections/edit_collection.html', {'form': form, 'collection': collection})
+
+# Add to Collection View
+@login_required
+def add_to_collection(request, collection_id):
+    collection = get_object_or_404(Collection, id=collection_id, createdBy=request.user)
+    if request.method == "POST":
+        cocktail_id = request.POST.get("cocktail_id")
+        cocktail = get_object_or_404(Cocktail, id=cocktail_id)
+        collection.cocktails.add(cocktail)
+        return redirect('my_collections')
+    cocktails = Cocktail.objects.all()
+    return render(request, 'collections/add_to_collection.html', {'collection': collection, 'cocktails': cocktails})
+
+# Delete Collection View
+@login_required
+def delete_collection(request, id):
+    collection = get_object_or_404(Collection, id=id)
+
+    if request.method == "POST":
+        collection.delete()
+        messages.success(request, "Collection deleted successfully!")
+        return redirect('my_collections')  # Redirect back to the list of collections
+
+    return render(request, 'collections/delete_collection.html', {'collection': collection})
+
+
 # Cocktail index view
 def cocktail_index(request):
     shared_cocktails = Cocktail.objects.filter(shared=True)
     return render(request, 'cocktails/index.html', {'cocktails': shared_cocktails})
+
+# User Cocktail index view
+def my_cocktails(request):
+    cocktails = Cocktail.objects.filter(creator=request.user)
+    return render(request, 'cocktails/my_cocktails.html', {'cocktails': cocktails})
 
 # Create Cocktail
 @login_required

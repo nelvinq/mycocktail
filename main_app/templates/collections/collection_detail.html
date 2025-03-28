@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>{{ collection.name }}</h1>
+
+<div class="collection-info">
+    <p><strong>Description</strong> {{ collection.description }}</p>
+    <p><strong>Created by:</strong> {{ collection.createdBy }} on: {{ collection.createdAt }} </p> 
+    <p><strong>Shared:</strong> {% if collection.shared %} Yes {% else %} No {% endif %}</p>
+    <div>
+        <a href="{% url 'edit_collection' collection.id %}" class="btn">Edit</a>
+        <a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a>
+    </div>
+    {% if collection.cocktails.all %}
+        <h2>Cocktails in this Collection</h2>
+        <ul>
+            {% for cocktail in collection.cocktails.all %}
+                <li>{{ cocktail.name }}</li>
+            {% empty %}
+                <p>No cocktails in this collection yet.</p>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>This collection has no cocktails yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Edit Collection</h1>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="button-container">
+        <button type="submit" class="btn btn-danger">Save</button>
+        <a href="{% url 'collection_detail' collection.id %}" class="btn btn-danger">Cancel</a>
+        </div>
+</form>
+{% endblock %}

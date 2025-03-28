@@ -31,6 +31,7 @@ class User(AbstractBaseUser):
 # Collection Model
 class Collection(models.Model):
     name = models.CharField(max_length=255)  # Name of the collection
+    description = models.TextField(null=True, blank=True)
     cocktails = models.ManyToManyField('Cocktail', related_name='collections')  # List of cocktails in the collection
     shared = models.BooleanField(default=False)  # Whether the collection is shared
     createdBy = models.ForeignKey('User', related_name='created_collections', on_delete=models.CASCADE)  # User who created the collection

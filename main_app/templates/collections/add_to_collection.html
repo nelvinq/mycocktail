@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Add Cocktail to {{ collection.name }}</h1>
+<form method="POST">
+    {% csrf_token %}
+    <label for="cocktail">Select Cocktail:</label>
+    <select name="cocktail_id">
+        {% for cocktail in cocktails %}
+            <option value="{{ cocktail.id }}">{{ cocktail.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Add</button>
+</form>
+<a href="{% url 'my_collections' %}">Back to Collections</a>
+{% endblock %}

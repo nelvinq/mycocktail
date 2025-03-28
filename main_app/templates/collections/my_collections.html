@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>My Collections</h1>
+<link rel="stylesheet" href="{% static 'css/collection-index.css' %}">
+<a href="{% url 'create_collection' %}" class="btn">Create New Collection</a>
+
+<div class="card-container">
+    {% for collection in collections %}
+        <div class="card">
+            <a href="{% url 'collection_detail' collection.id %}" class="card-link"></a>
+            <div class="card-img-container">
+            </div>
+            <div class="card-content">
+                <h2 class="card-title">{{ collection.name }}</h2>
+                <ul>
+                    {% for cocktail in collection.cocktails.all %}
+                        <li>{{ cocktail.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% empty %}
+        <p>You have no collections yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
