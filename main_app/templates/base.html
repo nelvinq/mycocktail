@@ -10,6 +10,11 @@
     <!-- Link to the CSS file -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <style>
+      body {
+          background-image: url("{% static 'images/app-background.png' %}");
+      }
+  </style>
     {% block head %}{% endblock %}
 </head>
 

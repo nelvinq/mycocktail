@@ -19,6 +19,6 @@ urlpatterns = [
     path('create-collection/', create_collection, name='create_collection'),
     path('collections/<int:id>/', views.collection_detail, name='collection_detail'),
     path('collection/edit-collection/<int:collection_id>/', edit_collection, name='edit_collection'),
-    path('add-to-collection/<int:collection_id>/', add_to_collection, name='add_to_collection'),
+    path('cocktails/<int:cocktail_id>/add-to-collection/', views.add_to_collection, name='add_to_collection'),
     path('collection/<int:id>/delete/', views.delete_collection, name='delete_collection'),
 ]

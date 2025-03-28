@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
   <!-- Include the cocktail index -->
   {% include "cocktails/index.html" %}
   

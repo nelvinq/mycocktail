@@ -79,16 +79,27 @@ def edit_collection(request, collection_id):
 
 # Add to Collection View
 @login_required
-def add_to_collection(request, collection_id):
-    collection = get_object_or_404(Collection, id=collection_id, createdBy=request.user)
-    if request.method == "POST":
-        cocktail_id = request.POST.get("cocktail_id")
-        cocktail = get_object_or_404(Cocktail, id=cocktail_id)
-        collection.cocktails.add(cocktail)
-        return redirect('my_collections')
-    cocktails = Cocktail.objects.all()
-    return render(request, 'collections/add_to_collection.html', {'collection': collection, 'cocktails': cocktails})
+def add_to_collection(request, cocktail_id):
+    cocktail = get_object_or_404(Cocktail, id=cocktail_id)
+    user_collections = Collection.objects.filter(createdBy=request.user)  # Get the user's collections
 
+    if request.method == "POST":
+        collection_id = request.POST.get("collection_id")  # Get selected collection
+        collection = get_object_or_404(Collection, id=collection_id)
+
+        if cocktail in collection.cocktails.all():
+            messages.warning(request, "Cocktail is already in this collection!")
+        else:
+            collection.cocktails.add(cocktail)
+            messages.success(request, "Cocktail added to collection successfully!")
+
+        return redirect('cocktail_detail', cocktail_id=cocktail.id)  # Redirect back to cocktail detail page
+
+    return render(request, 'cocktails/add_to_collection.html', {
+        'cocktail': cocktail,
+        'user_collections': user_collections
+    })
+    
 # Delete Collection View
 @login_required
 def delete_collection(request, id):
@@ -227,7 +238,11 @@ def create_cocktail(request):
 # View cocktail details
 def cocktail_detail(request, cocktail_id):
     cocktail = Cocktail.objects.get(id=cocktail_id)
-    return render(request, 'cocktails/cocktail_detail.html', {'cocktail': cocktail})
+    if request.user.is_authenticated:
+        user_collections = Collection.objects.filter(createdBy=request.user)
+    else:
+        user_collections = []
+    return render(request, 'cocktails/cocktail_detail.html', {'cocktail': cocktail, 'user_collections': user_collections})
     
 # Edit cocktail (only creator can edit)
 @login_required
@@ -357,6 +372,7 @@ def delete_cocktail(request, cocktail_id):
     cocktail = get_object_or_404(Cocktail, id=cocktail_id, creator=request.user)
     if request.method == "POST":
         cocktail.delete()
+        messages.success(request, "Collection deleted successfully!")
         return redirect('browse')  # Redirect to the cocktail list after deletion
 
     return render(request, 'cocktails/delete_cocktail.html', {'cocktail': cocktail})

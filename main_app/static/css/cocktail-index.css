@@ -1,8 +1,6 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
 }
 
 .page-header {

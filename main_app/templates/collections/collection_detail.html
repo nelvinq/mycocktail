@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/cocktail-index.css' %}">
+<button onclick="history.back()" class="btn btn-secondary">Go Back</button>
+
 <h1>{{ collection.name }}</h1>
 
 <div class="collection-info">
@@ -13,14 +16,27 @@
         <a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a>
     </div>
     {% if collection.cocktails.all %}
-        <h2>Cocktails in this Collection</h2>
-        <ul>
-            {% for cocktail in collection.cocktails.all %}
-                <li>{{ cocktail.name }}</li>
-            {% empty %}
-                <p>No cocktails in this collection yet.</p>
-            {% endfor %}
-        </ul>
+    <section class="card-container">
+        {% for cocktail in collection.cocktails.all %}
+          <div class="card">
+            <a href="{% url 'cocktail_detail' cocktail.id %}"></a>
+            <div class="card-content">
+              <div class="card-img-container">
+                {% if cocktail.image_url %}
+                  <img src="{{ cocktail.image_url }}" alt="{{ cocktail.name }}" class="card-img">
+                {% else %}
+                  <img src="{% static 'images/default-cocktail.jpg' %}" alt="Default Cocktail" class="card-img">
+                {% endif %}
+              </div>
+              <h2 class="card-title">{{ cocktail.name }}</h2>
+              <p><small>{{ cocktail.description }}</small></p>
+              <p><strong>Category:</strong> {{ cocktail.category }}</p>
+              <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
+              <p><strong>Created by:</strong> {{ cocktail.creator }}</p>
+            </div>
+          </div>
+          {% endfor %}
+    </section>
     {% else %}
         <p>This collection has no cocktails yet.</p>
     {% endif %}

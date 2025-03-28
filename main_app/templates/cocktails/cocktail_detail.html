@@ -3,6 +3,17 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/cocktail-modal.css' %}">
 
+<button onclick="history.back()" class="btn btn-secondary">Go Back</button>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+
 <div class="container">
   <h1>{{ cocktail.name }}</h1>
   {% if cocktail.image_url %}
@@ -37,6 +48,20 @@
     <li>{{ step }}</li>
     {% endfor %}
   </ol>
+
+  {% if request.user.is_authenticated %}
+  <form method="POST" action="{% url 'add_to_collection' cocktail.id %}">
+    {% csrf_token %}
+    <label for="collection">Add to Collection:</label>
+    <select name="collection_id" id="collection">
+        {% for collection in user_collections %}
+            <option value="{{ collection.id }}">{{ collection.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endif %}
+
   {% if request.user == cocktail.creator %}
 
   <!-- Edit Button Triggers Modal -->

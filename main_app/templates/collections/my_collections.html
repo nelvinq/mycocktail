@@ -2,6 +2,14 @@
 {% load static %}
 
 {% block content %}
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 <h1>My Collections</h1>
 <link rel="stylesheet" href="{% static 'css/collection-index.css' %}">
 <a href="{% url 'create_collection' %}" class="btn">Create New Collection</a>
