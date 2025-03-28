@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Create Collection</h1>
-<form method="POST">
+<form method="POST" class="user-form">
+    <h1>Create Collection</h1>
     {% csrf_token %}
-    {{ form.as_p }}
+    <label for="name">Name:</label>
+    <input type="text" name="name" required>
+    <label for="description">Description:</label>
+    <textarea name="description"></textarea>
+    <div class="checkbox-container">
+    <label for="shared">Share to Public:</label>
+    <input type="checkbox" id="shared" name="shared" checked>
+    </div>
+
     <div class="button-container">
     <button type="submit" class="btn btn-danger">Create</button>
     <a href="{% url 'my_collections' %}" class="btn btn-danger">Cancel</a>

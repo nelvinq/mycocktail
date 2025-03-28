@@ -40,6 +40,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   margin:0;
+  width: 100%;
 
   background-size: cover; /* Make sure the background covers the entire page */
   background-position: top; /* Center the background image */
@@ -55,6 +56,11 @@ body::before {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);  /* 0.5 is the opacity of the black overlay */
   z-index: -1;  /* Make sure the overlay is behind the content */
+}
+
+main {
+  min-width: 900px;
+  max-width: 95%;
 }
 
 /* Sticky Navbar */
@@ -163,6 +169,14 @@ nav ul li .button:hover {
 .danger { color: var(--danger); border-color: var(--danger); }
 
 /* Page Header */
+
+.page-header {
+  display: flex;
+  justify-content: space-between; /* Space between header content and action buttons */
+  align-items: center; /* Aligns content vertically in the center */
+  margin-bottom: 1.5rem; /* Space below the header */
+}
+
 .page-header h1 {
   font-size: var(--font-xxl);
   margin: 0;
@@ -221,6 +235,14 @@ select:focus {
   border-color: #66afe9;
   outline: none;
 }
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Ensure elements are aligned to the left */
+  gap: 10px; /* Space between the label and checkbox */
+}
+
 
 /* Link Styles */
 p {
@@ -301,4 +323,62 @@ p a:hover {
   width: 500px;
   height: 500px;
   object-fit: cover;
+}
+
+/* Form container styling */
+.cocktail-search-form {
+  min-width: 800px;
+  max-width: 95%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px auto; /* Center the form horizontally */
+  padding: 10px; /* Add padding to the form */
+  background-color: rgba(116, 116, 116, 0.8); /* Optional: add background with some transparency */
+  border-radius: 8px; /* Optional: rounded corners */
+  flex-direction: row;
+}
+
+/* Style for input fields */
+.cocktail-search-form .form-input {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc; /* Light gray border */
+  margin-right: 10px; /* Space between form elements */
+  width: auto; /* Let the element adjust its width as needed */
+  flex: 3; /* Makes the text input wider */
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+}
+
+/* Style for select dropdowns */
+.cocktail-search-form .form-select {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc; /* Light gray border */
+  margin-right: 10px; /* Space between form elements */
+  width: auto; /* Let the element adjust its width as needed */
+  flex: 1; /* Makes the selects a bit smaller than the text input */
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+}
+
+/* Style for the search button */
+.cocktail-search-form .form-button {
+  margin-top: 0;
+  padding: 8px 12px;
+  color: white;
+  cursor: pointer;
+  border: none; /* Remove default button border */
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.user-form {
+  width: 40%;
+  margin: auto;
 }

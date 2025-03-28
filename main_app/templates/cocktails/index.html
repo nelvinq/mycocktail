@@ -24,8 +24,6 @@
 <body>
 
 {% block content %}
-<section class="page-header">
-</section>
 
 <section class="card-container">
   {% for cocktail in cocktails %}
@@ -47,7 +45,7 @@
       </div>
     </div>
   {% empty %}
-    <p>No shared cocktails available.</p>
+    <p>You have no cocktails yet.</p>
   {% endfor %}
 </section>
 

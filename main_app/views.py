@@ -1,6 +1,4 @@
-import os
-import mimetypes
-import json
+import os, mimetypes, json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
@@ -8,14 +6,14 @@ from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, AuthenticationForm, CocktailForm, LoginForm, CollectionForm
-from .models import Cocktail, Ingredient, Step
+from .models import Cocktail, Ingredient, Step, Collection
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core import serializers
 from django.urls import reverse_lazy
+from django.db.models import Q
 from supabase import create_client
-
 
 # Initialize Supabase Client
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
@@ -31,13 +29,67 @@ def about(request):
 
 # Browse view
 def browse(request):
-    shared_cocktails = Cocktail.objects.filter(shared=True)
-    return render(request, 'cocktails/browse.html', {'cocktails': shared_cocktails})
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    alcoholic_filter = request.GET.get('alcoholic', '')
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import Collection, Cocktail
-from .forms import CollectionForm
+    # Get shared cocktails and apply search filters
+    cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
+    shared_cocktails = cocktails.filter(shared=True)  # Filter for shared cocktails only
+
+    return render(request, 'cocktails/browse.html', {
+        'cocktails': shared_cocktails,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'alcoholic_filter': alcoholic_filter,
+    })
+
+# Cocktail index view
+def cocktail_index(request):
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    alcoholic_filter = request.GET.get('alcoholic', '')
+
+    # Get shared cocktails and apply search filters
+    cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
+    shared_cocktails = cocktails.filter(shared=True)  # Filter for shared cocktails only
+
+    return render(request, 'cocktails/browse.html', {
+        'cocktails': shared_cocktails,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'alcoholic_filter': alcoholic_filter,
+    })
+    
+
+# User Cocktail index view
+def my_cocktails(request):
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    alcoholic_filter = request.GET.get('alcoholic', '')
+
+    # Get cocktails created by the user and apply search filters
+    cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
+    user_cocktails = cocktails.filter(creator=request.user)
+
+    return render(request, 'cocktails/my_cocktails.html', {
+        'cocktails': user_cocktails,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'alcoholic_filter': alcoholic_filter,
+    })
+
+# Search and filter Cocktails
+def search_cocktails(query, category='', alcoholic=''):
+    cocktails = Cocktail.objects.all()
+    if query:
+        cocktails = cocktails.filter(Q(name__icontains=query))
+    if category:
+        cocktails = cocktails.filter(category=category)
+    if alcoholic:
+        is_alcoholic = alcoholic == 'yes'
+        cocktails = cocktails.filter(alcoholic=is_alcoholic)
+    return cocktails
 
 # My Collection View
 @login_required
@@ -60,6 +112,7 @@ def create_collection(request):
     return render(request, 'collections/create_collection.html', {'form': form})
 
 # View Collection Details
+@login_required
 def collection_detail(request, id):
     collection = get_object_or_404(Collection, id=id)
     return render(request, 'collections/collection_detail.html', {'collection': collection})
@@ -112,16 +165,6 @@ def delete_collection(request, id):
 
     return render(request, 'collections/delete_collection.html', {'collection': collection})
 
-
-# Cocktail index view
-def cocktail_index(request):
-    shared_cocktails = Cocktail.objects.filter(shared=True)
-    return render(request, 'cocktails/index.html', {'cocktails': shared_cocktails})
-
-# User Cocktail index view
-def my_cocktails(request):
-    cocktails = Cocktail.objects.filter(creator=request.user)
-    return render(request, 'cocktails/my_cocktails.html', {'cocktails': cocktails})
 
 # Create Cocktail
 @login_required

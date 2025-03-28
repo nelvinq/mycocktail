@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class=user-form>
   <h2>Login</h2>
 
   {% if messages %}
@@ -29,4 +30,5 @@
 
 
   <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
-{% endblock %}
+</div>
+  {% endblock %}

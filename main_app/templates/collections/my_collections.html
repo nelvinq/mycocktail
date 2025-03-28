@@ -9,10 +9,14 @@
     {% endfor %}
   </ul>
 {% endif %}
-
-<h1>My Collections</h1>
 <link rel="stylesheet" href="{% static 'css/collection-index.css' %}">
+
+<div class="page-header">
+<h1>My Collections</h1>
+<div class="page-action">
 <a href="{% url 'create_collection' %}" class="btn">Create New Collection</a>
+</div>
+</div>
 
 <div class="card-container">
     {% for collection in collections %}
