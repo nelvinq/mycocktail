@@ -3,21 +3,59 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/cocktail-index.css' %}">
-<button onclick="history.back()" class="btn btn-secondary">Go Back</button>
 
-<h1>{{ collection.name }}</h1>
+<button onclick="history.back()" class="btn btn-secondary">Back</button>
 
-<div class="collection-info">
-    <p><strong>Description</strong> {{ collection.description }}</p>
-    <p><strong>Created by:</strong> {{ collection.createdBy }} on: {{ collection.createdAt }} </p> 
-    <p><strong>Shared:</strong> {% if collection.shared %} Yes {% else %} No {% endif %}</p>
-    <div>
+<div class="page-header">
+    <h1>{{ collection.name }}</h1>
+    <div class="page-action">
         <a href="{% url 'edit_collection' collection.id %}" class="btn">Edit</a>
         <a href="{% url 'delete_collection' collection.id %}" class="btn btn-danger">Delete</a>
     </div>
+</div>
+
+
+<div class="collection-info">
+    <p><strong>Description:</strong></p>
+    <p>{{ collection.description }}</p>
+    <br>
+    <p><strong>Created by:</strong> {{ collection.createdBy }} </p>
+    <p><strong>Shared:</strong> {% if collection.shared %} Yes {% else %} No {% endif %}</p>
+</div>
+
+    <form method="GET" action="{% url 'collection_detail' collection.id %}" class="cocktail-search-form">
+
+        <input type="text" name="search" value="{{ search_query }}" placeholder="Search Cocktails..." class="form-input" />
+      
+        <select name="category" class="form-select">
+          <option value="">All Categories</option>
+          <option value="Classic" {% if category_filter == 'Classic' %} selected {% endif %}>Classic Cocktails</option>
+          <option value="Tropical" {% if category_filter == 'Tropical' %} selected {% endif %}>Tropical Cocktails</option>
+          <option value="Signature" {% if category_filter == 'Signature' %} selected {% endif %}>Signature Cocktails</option>
+          <option value="Modern" {% if category_filter == 'Modern' %} selected {% endif %}>Modern Cocktails</option>
+          <option value="Frozen" {% if category_filter == 'Frozen' %} selected {% endif %}>Frozen Cocktails</option>
+          <option value="Highball" {% if category_filter == 'Highball' %} selected {% endif %}>Highball Cocktails</option>
+          <option value="Lowball" {% if category_filter == 'Lowball' %} selected {% endif %}>Lowball / Rocks Cocktails</option>
+          <option value="Sours" {% if category_filter == 'Sours' %} selected {% endif %}>Sours</option>
+          <option value="Punch" {% if category_filter == 'Punch' %} selected {% endif %}>Punch Cocktails</option>
+          <option value="Shots" {% if category_filter == 'Shots' %} selected {% endif %}>Shots</option>
+          <option value="Martini" {% if category_filter == 'Martini' %} selected {% endif %}>Martinis</option>
+          <option value="Champagne" {% if category_filter == 'Champagne' %} selected {% endif %}>Champagne & Sparkling Cocktails</option>
+          <option value="Mocktail" {% if category_filter == 'Mocktail' %} selected {% endif %}>Mocktails</option>
+        </select>
+      
+        <select name="alcoholic" class="form-select">
+          <option value="">Any</option>
+          <option value="yes" {% if alcoholic_filter == 'yes' %} selected {% endif %}>Alcoholic</option>
+          <option value="no" {% if alcoholic_filter == 'no' %} selected {% endif %}>Non-Alcoholic</option>
+        </select>
+      
+        <button type="submit" class="form-button">Search</button>
+      </form>
+
     {% if collection.cocktails.all %}
     <section class="card-container">
-        {% for cocktail in collection.cocktails.all %}
+        {% for cocktail in cocktails%}
           <div class="card">
             <a href="{% url 'cocktail_detail' cocktail.id %}"></a>
             <div class="card-content">
@@ -38,8 +76,8 @@
           {% endfor %}
     </section>
     {% else %}
-        <p>This collection has no cocktails yet.</p>
+        <p style="text-align: center">This collection has no cocktails yet.</p>
     {% endif %}
-</div>
+
 
 {% endblock %}

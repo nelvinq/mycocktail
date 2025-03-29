@@ -1,9 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/cocktail-detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/cocktail-modal.css' %}">
 
-<button onclick="history.back()" class="btn btn-secondary">Go Back</button>
+<button onclick="history.back()" class="btn btn-secondary">Back</button>
+
+<div class="page-header">
+  <h1>{{ cocktail.name }}</h1>
+  <div class="page-action">
+  {% if request.user == cocktail.creator %}
+  <!-- Action Buttons: Edit and Delete -->
+  <div class="action-buttons">
+      <a href="#" class="btn btn-primary" id="openEditModalBtn" data-cocktail-id="{{ cocktail.id }}">Edit Cocktail</a>
+      <a href="{% url 'delete_cocktail' cocktail.id %}" class="btn btn-danger">Delete Cocktail</a>
+  </div>
+  {% endif %}
+  </div>
+  </div>
 
 {% if messages %}
   <ul class="messages">
@@ -13,62 +27,59 @@
   </ul>
 {% endif %}
 
-
-<div class="container">
-  <h1>{{ cocktail.name }}</h1>
-  {% if cocktail.image_url %}
-  <img src="{{ cocktail.image_url }}" alt="{{ cocktail.name }}" class="detail-card-img">
-  {% else %}
-  <img src="{% static 'images/default-cocktail.jpg' %}" alt="Default Cocktail" class="detail-card-img">
-  {% endif %}
-
-  <p><strong>Description:</strong> {{ cocktail.description }}</p>
-
-  <p><strong>Category:</strong> {{ cocktail.category }}</p>
-
-  <p><strong>Glass Type:</strong> {{ cocktail.glass_type }}</p>
-
-  <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
-
-  <p><strong>Shared to Public:</strong> {% if cocktail.shared %} Yes {% else %} No {% endif %}</p>
-
-  <p><strong>Ingredients:</strong></p>
-  <ul>
-    {% for ingredient in cocktail.ingredients.all %}
-    <li>{{ ingredient.name }} - {{ ingredient.amount }} {{ ingredient.unit }}
-      {% if ingredient.garnish %}(Garnish){% endif %}
-      {% if ingredient.optional %}(Optional){% endif %}
-    </li>
-    {% endfor %}
-  </ul>
-
-  <p><strong>Instructions:</strong></p>
-  <ol>
-    {% for step in cocktail.steps.all %}
-    <li>{{ step }}</li>
-    {% endfor %}
-  </ol>
-
-  {% if request.user.is_authenticated %}
-  <form method="POST" action="{% url 'add_to_collection' cocktail.id %}">
-    {% csrf_token %}
-    <label for="collection">Add to Collection:</label>
-    <select name="collection_id" id="collection">
-        {% for collection in user_collections %}
-            <option value="{{ collection.id }}">{{ collection.name }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit" class="btn btn-primary">Add</button>
+<div class="container cocktail-detail-container">
+  <div class="cocktail-image">
+    {% if cocktail.image_url %}
+    <img src="{{ cocktail.image_url }}" alt="{{ cocktail.name }}" class="detail-card-img">
+    {% else %}
+    <img src="{% static 'images/default-cocktail.jpg' %}" alt="Default Cocktail" class="detail-card-img">
+    {% endif %}
+    {% if request.user.is_authenticated %}
+<!-- Add to Collection Form -->
+<form method="POST" action="{% url 'add_to_collection' cocktail.id %}" class="add-to-collection-form">
+  {% csrf_token %}
+  <label for="collection">Add to Collection:</label>
+  <div class="collection-select-wrapper">
+  <select name="collection_id" id="collection">
+      {% for collection in user_collections %}
+          <option value="{{ collection.id }}">{{ collection.name }}</option>
+      {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-primary">Add</button>
+</div>
 </form>
 {% endif %}
+</div>
 
-  {% if request.user == cocktail.creator %}
+  <div class="cocktail-details">
 
-  <!-- Edit Button Triggers Modal -->
-  <a href="#" class="btn btn-primary" id="openEditModalBtn" data-cocktail-id="{{ cocktail.id }}">Edit Cocktail</a>
-  <a href="{% url 'delete_cocktail' cocktail.id %}" class="btn btn-danger">Delete Cocktail</a>
+    <div class="cocktail-detail">
+      <p><strong>Description:</strong><span class="cocktail-value">{{ cocktail.description }}</span></p>
+      <p><strong>Category:</strong><span class="cocktail-value">{{ cocktail.category }}</span></p>
+      <p><strong>Glass Type:</strong><span class="cocktail-value">{{ cocktail.glass_type }}</span></p>
+      <p><strong>Alcoholic:</strong><span class="cocktail-value">{% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</span></p>
+      <p><strong>Shared to Public:</strong><span class="cocktail-value">{% if cocktail.shared %} Yes {% else %} No {% endif %}</span></p>
+    </div>
+    <hr class="styled-line">
+    <p><strong>Ingredients:</strong></p>
+    <ul>
+      {% for ingredient in cocktail.ingredients.all %}
+        <li>{{ ingredient.name }} - {{ ingredient.amount }} {{ ingredient.unit }}
+          {% if ingredient.garnish %}(Garnish){% endif %}
+          {% if ingredient.optional %}(Optional){% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <p><strong>Instructions:</strong></p>
+    <ol>
+      {% for step in cocktail.steps.all %}
+        <li>{{ step }}</li>
+      {% endfor %}
+    </ol>
+  </div>
 
-  {% endif %}
+</div>
+
 
   <!-- Edit Cocktail Modal -->
   <div id="editCocktailModal" class="modal">

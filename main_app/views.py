@@ -21,11 +21,23 @@ supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 # Home view
 def home(request):
     shared_cocktails = Cocktail.objects.filter(shared=True)  # Reuse the same query
-    return render(request, 'home.html', {'cocktails': shared_cocktails})
+    return render(request, 'cocktails/browse.html', {'cocktails': shared_cocktails})
 
 # About view
 def about(request):
     return render(request, 'about.html')
+
+# Search and filter Cocktails
+def search_cocktails(query, category='', alcoholic=''):
+    cocktails = Cocktail.objects.all()
+    if query:
+        cocktails = cocktails.filter(Q(name__icontains=query))
+    if category:
+        cocktails = cocktails.filter(category=category)
+    if alcoholic:
+        is_alcoholic = alcoholic == 'yes'
+        cocktails = cocktails.filter(alcoholic=is_alcoholic)
+    return cocktails
 
 # Browse view
 def browse(request):
@@ -79,17 +91,29 @@ def my_cocktails(request):
         'alcoholic_filter': alcoholic_filter,
     })
 
-# Search and filter Cocktails
-def search_cocktails(query, category='', alcoholic=''):
-    cocktails = Cocktail.objects.all()
-    if query:
-        cocktails = cocktails.filter(Q(name__icontains=query))
-    if category:
-        cocktails = cocktails.filter(category=category)
-    if alcoholic:
-        is_alcoholic = alcoholic == 'yes'
-        cocktails = cocktails.filter(alcoholic=is_alcoholic)
-    return cocktails
+# View Collection Details
+@login_required
+def collection_detail(request, id):
+    collection = get_object_or_404(Collection, id=id)
+
+    search_query = request.GET.get('search', '').strip()
+    category_filter = request.GET.get('category', '')
+    alcoholic_filter = request.GET.get('alcoholic', '')
+
+    # Get all cocktails in the collection
+    cocktails = collection.cocktails.all()
+
+    # Use search_cocktails to apply filtering within this collection
+    filtered_cocktails = search_cocktails(search_query, category_filter, alcoholic_filter).filter(id__in=cocktails.values_list('id', flat=True))
+
+    return render(request, 'collections/collection_detail.html', {
+        'collection': collection,  
+        'cocktails': filtered_cocktails,    
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'alcoholic_filter': alcoholic_filter,
+    })
+
 
 # My Collection View
 @login_required
@@ -111,11 +135,6 @@ def create_collection(request):
         form = CollectionForm()
     return render(request, 'collections/create_collection.html', {'form': form})
 
-# View Collection Details
-@login_required
-def collection_detail(request, id):
-    collection = get_object_or_404(Collection, id=id)
-    return render(request, 'collections/collection_detail.html', {'collection': collection})
 
 # Edit Collection View
 @login_required
@@ -125,7 +144,7 @@ def edit_collection(request, collection_id):
         form = CollectionForm(request.POST, instance=collection)
         if form.is_valid():
             form.save()
-            return redirect('my_collections')
+        return redirect('collection_detail', id=collection.id)
     else:
         form = CollectionForm(instance=collection)
     return render(request, 'collections/edit_collection.html', {'form': form, 'collection': collection})
