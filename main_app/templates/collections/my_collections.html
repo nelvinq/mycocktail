@@ -26,11 +26,14 @@
             </div>
             <div class="card-content">
                 <h2 class="card-title">{{ collection.name }}</h2>
-                <ul>
-                    {% for cocktail in collection.cocktails.all %}
-                        <li>{{ cocktail.name }}</li>
-                    {% endfor %}
-                </ul>
+                <p style="opacity: 0.7; font-style: italic">{{ collection.description|truncatewords:20 }}</p>
+                <p class="cocktail-count">
+                <strong>{{ collection.cocktails.count }}</strong> {% if collection.cocktails.count == 0 %}
+                    cocktail
+                {% else %}
+                    {{ collection.cocktails.count|pluralize:"cocktail,cocktails" }}
+                {% endif %}
+                </p>
             </div>
         </div>
     {% empty %}
