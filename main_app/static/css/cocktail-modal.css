@@ -47,7 +47,7 @@ input[type="text"], input[type="file"], textarea, select {
     box-sizing: border-box;
     border-radius: 5px;
     border: 1px solid #ccc;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 }
 
 textarea {
@@ -62,7 +62,6 @@ input[type="checkbox"] {
 /* Button Styles */
 button {
     font-size: 1.3em;
-    margin-top: 10px;
     padding: 10px 15px;
     background-color: #b70f0f;
     color: white;
@@ -80,7 +79,7 @@ button:hover {
 .sortable {
     list-style-type: none;
     padding: 0;
-    margin: 0;
+    margin: 10px 0px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -89,10 +88,11 @@ button:hover {
 }
 
 .sortable-item {
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 5px;
     background-color: #333;
     padding: 10px;
     border-radius: 5px;
@@ -129,12 +129,13 @@ button:hover {
 /* Ingredient and Optional Groups */
 .ingredient-group, .optional-group {
     display: flex;
-    gap: 10px;
+    gap: 5px;
     align-items: center;
+    margin-bottom: 0;
 }
 
 .optional-group label {
-    font-size: 14px;
+    font-size: 1rem;
 }
 
 /* Steps List */
@@ -152,15 +153,45 @@ button:hover {
 }
 
 #steps-list input {
-    width: calc(100% - 50px);
-    padding: 10px;
-    font-size: 1.2em;
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#edit-steps-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#edit-steps-list .sortable-item {
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+#edit-steps-list input {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 1.2rem;
     border-radius: 5px;
     border: 1px solid #ccc;
 }
 
 /* Modal Close Button */
 .close {
+    font-size: 2em;
+    color: #aaa;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+}
+
+.closeEdit{
     font-size: 2em;
     color: #aaa;
     cursor: pointer;
