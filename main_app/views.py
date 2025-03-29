@@ -171,7 +171,16 @@ def add_to_collection(request, cocktail_id):
         'cocktail': cocktail,
         'user_collections': user_collections
     })
-    
+
+# Remove from Collection View
+login_required
+def remove_cocktail(request, cocktail_id):
+    if request.method == 'DELETE':
+        cocktail = get_object_or_404(Cocktail, id=cocktail_id)
+        cocktail.delete()
+        return JsonResponse({'message': 'Cocktail removed successfully'}, status=200)
+    return JsonResponse({'message': 'Invalid request'}, status=400)
+
 # Delete Collection View
 @login_required
 def delete_collection(request, id):

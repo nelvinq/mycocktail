@@ -55,9 +55,8 @@
     {% if collection.cocktails.all %}
     <section class="card-container">
         {% for cocktail in cocktails%}
-          <div class="card">
-            <a href="{% url 'cocktail_detail' cocktail.id %}"></a>
-            <div class="card-content">
+        <div class="card" id="cocktail-{{ cocktail.id }}" onclick="viewCocktailDetails('{{ cocktail.id }}')">
+          <div class="card-content">
               <div class="card-img-container">
                 {% if cocktail.image_url %}
                   <img src="{{ cocktail.image_url }}" alt="{{ cocktail.name }}" class="card-img">
@@ -70,7 +69,9 @@
               <p><strong>Category:</strong> {{ cocktail.category }}</p>
               <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
               <p><strong>Created by:</strong> {{ cocktail.creator }}</p>
-            </div>
+              <div class="remove-button-container">
+                <button onclick="event.stopPropagation(); removeCocktail('{{ cocktail.id }}')">Remove</button>
+              </div>            </div>
           </div>
           {% endfor %}
     </section>
@@ -78,5 +79,34 @@
         <p style="text-align: center">This collection has no cocktails yet.</p>
     {% endif %}
 
+    <script>
+        function viewCocktailDetails(cocktailId) {
+          window.location.href = `/cocktails/${cocktailId}`;
+        }
+      function removeCocktail(cocktailId) {
+          if (confirm("Are you sure you want to remove this cocktail?")) {
+              // Make a DELETE request to remove the cocktail
+              fetch(`/collections/${cocktailId}/remove-cocktail`, {
+                method: 'DELETE',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': '{{ csrf_token }}',  // CSRF token for security
+                  },
+              })
+              .then(response => {
+                  if (response.ok) {
+                      // On success, remove the cocktail card from the page
+                      document.getElementById(`cocktail-${cocktailId}`).remove();
+                  } else {
+                      alert("Failed to remove cocktail.");
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  alert("An error occurred.");
+              });
+          }
+      }
+  </script>
 
 {% endblock %}
