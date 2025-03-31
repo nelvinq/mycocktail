@@ -13,7 +13,7 @@ from django.core.files.base import ContentFile
 from django.core import serializers
 from django.urls import reverse_lazy
 from django.db.models import Q
-from supabase import create_client
+from supabase import create_client, Client
 
 # Initialize Supabase Client
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
@@ -443,8 +443,8 @@ def delete_cocktail(request, cocktail_id):
     cocktail = get_object_or_404(Cocktail, id=cocktail_id, creator=request.user)
     if request.method == "POST":
         cocktail.delete()
-        messages.success(request, "Collection deleted successfully!")
-        return redirect('browse')  # Redirect to the cocktail list after deletion
+        messages.success(request, "Cocktail deleted successfully!")
+        return redirect('my_cocktails')
 
     return render(request, 'cocktails/delete_cocktail.html', {'cocktail': cocktail})
 
@@ -484,4 +484,4 @@ class CustomLoginView(LoginView):
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect('browse')

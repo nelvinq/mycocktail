@@ -40,12 +40,17 @@
   {% csrf_token %}
   <label for="collection">Add to Collection:</label>
   <div class="collection-select-wrapper">
-  <select name="collection_id" id="collection">
-      {% for collection in user_collections %}
+    {% if user_collections %}
+      <!-- If the user has collections, show the select dropdown -->
+      <select name="collection_id" id="collection">
+        {% for collection in user_collections %}
           <option value="{{ collection.id }}">{{ collection.name }}</option>
-      {% endfor %}
-  </select>
-  <button type="submit" class="btn btn-primary">Add</button>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary">Add</button>
+    {% else %}
+      <p>You don't have any collections yet. <a href="{% url 'create_collection' %}">Create one now</a>.</p>
+    {% endif %}
 </div>
 </form>
 {% endif %}
