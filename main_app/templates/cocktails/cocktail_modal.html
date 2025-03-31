@@ -77,6 +77,11 @@
       <label for="image">Upload Image:</label>
       <input type="file" id="image" name="image">
 
+      <div id="imagePreviewContainer" style="display: none;">
+        <h4>Image Preview:</h4>
+        <img id="imagePreview" src="" alt="Selected Image Preview" style="max-width: 150px; height: 150px; border-radius: 8px;">
+      </div>
+
       <!-- Ingredients Section -->
       <h4>Ingredients</h4>
       <ul id="ingredients-list" class="sortable">
@@ -117,6 +122,25 @@
       }
     };
 
+    const imageInput = document.getElementById('image');
+      const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+      const imagePreview = document.getElementById('imagePreview');
+
+      imageInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreviewContainer.style.display = 'block'; // Show the preview section
+            imagePreview.src = e.target.result; // Set the preview image source
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreviewContainer.style.display = 'none'; // Hide preview if no file selected
+        }
+      });
+    
     // Ingredient List Management
     const ingredientsList = document.getElementById("ingredients-list");
     const addIngredientBtn = document.getElementById("addIngredientBtn");

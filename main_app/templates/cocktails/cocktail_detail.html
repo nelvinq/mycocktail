@@ -152,6 +152,11 @@
         <label for="edit_image">Upload Image:</label>
         <input type="file" id="edit_image" name="image">
 
+        <div id="editImagePreviewContainer" style="display: none;">
+          <h4>Image Preview:</h4>
+          <img id="editImagePreview" src="" alt="Selected Image Preview" style="max-width: 150px; height: 150px; border-radius: 8px;">
+        </div>
+
         <!-- Ingredients Section -->
         <h4>Ingredients</h4>
         <ul id="edit-ingredients-list" class="sortable">
@@ -198,7 +203,28 @@
           console.error("No cocktail ID found");
         }
       });
+      
+      const imageInput = document.getElementById('edit_image');
+      const imagePreviewContainer = document.getElementById('editImagePreviewContainer');
+      const imagePreview = document.getElementById('editImagePreview');
+
+      imageInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreviewContainer.style.display = 'block'; // Show the preview section
+            imagePreview.src = e.target.result; // Set the preview image source
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreviewContainer.style.display = 'none'; // Hide preview if no file selected
+        }
+      });
+
     });
+
 
     function openEditModal(cocktailId) {
       fetch(`/cocktails/${cocktailId}/edit/`)  // Fetch the cocktail data to populate the form

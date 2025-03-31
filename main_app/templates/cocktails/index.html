@@ -17,8 +17,17 @@
           line-clamp: 2;
           overflow: hidden;                   
           text-overflow: ellipsis;
-          min-height: 2.5em;                  
+          min-height: 3em;                  
+          white-space: normal;
       }
+      .card-description {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          height: 4em; 
+        }
   </style>
 </head>
 <body>
@@ -38,7 +47,7 @@
           {% endif %}
         </div>
         <h2 class="card-title">{{ cocktail.name }}</h2>
-        <p><small>{{ cocktail.description }}</small></p>
+        <p class="card-description"><small>{{ cocktail.description }}</small></p>
         <p><strong>Category:</strong> {{ cocktail.category }}</p>
         <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
         <p><strong>Created by:</strong> {{ cocktail.creator }}</p>
