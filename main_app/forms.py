@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from django import forms
-from .models import Cocktail, Ingredient
+from .models import Cocktail, Ingredient, Comment
 from django.core.exceptions import ValidationError
 
 User = get_user_model()
@@ -78,3 +78,8 @@ class CollectionForm(forms.ModelForm):
     class Meta:
         model = Collection
         fields = ['name', 'description', 'shared']
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']

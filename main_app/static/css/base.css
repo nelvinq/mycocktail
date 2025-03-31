@@ -178,6 +178,11 @@ nav ul li .button:hover {
 .secondary { color: var(--secondary); border-color: var(--secondary); }
 .warn { color: var(--warn); border-color: var(--warn); }
 .danger { color: var(--danger); border-color: var(--danger); }
+.like-btn{
+  font-size: 1.2rem;
+  padding: 5px;
+  margin-left: 10px;
+}
 
 /* Page Header */
 
@@ -186,6 +191,11 @@ nav ul li .button:hover {
   justify-content: space-between; /* Space between header content and action buttons */
   align-items: center; /* Aligns content vertically in the center */
   margin-bottom: 1.5rem; /* Space below the header */
+}
+
+.d-flex{
+  display: flex;
+  justify-content: space-between;
 }
 
 .page-header h1 {

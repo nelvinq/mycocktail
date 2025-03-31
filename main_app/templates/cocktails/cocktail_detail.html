@@ -7,7 +7,19 @@
 <button onclick="history.back()" class="btn btn-secondary">Back</button>
 
 <div class="page-header">
+  <div class="d-flex">
   <h1>{{ cocktail.name }}</h1>
+  <form action="{% url 'like_cocktail' cocktail.id %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="like-btn">
+        {% if request.user in cocktail.likes.all %}
+            <i class="fas fa-heart"></i> Unlike
+        {% else %}
+            <i class="far fa-heart"></i> Like
+        {% endif %}
+    </button>
+  </form>
+  </div>
   <div class="page-action">
   {% if request.user == cocktail.creator %}
   <!-- Action Buttons: Edit and Delete -->
@@ -17,7 +29,7 @@
   </div>
   {% endif %}
   </div>
-  </div>
+</div>
 
 {% if messages %}
   <ul class="messages">
@@ -82,8 +94,43 @@
       {% endfor %}
     </ol>
   </div>
-
 </div>
+
+    <!-- Comments Section -->
+    <h2>Comments</h2>
+  {% if comments.count == 0 %}
+      <p>No comments available.</p>
+    {% else %}
+    <div class="comments">
+      {% for comment in comments %}
+        <div class="comment">
+          <p><strong>{{ comment.user.username }}:</strong> {{ comment.text }}</p>
+          <p id="comment-time">{{ comment.created_at }}</p>
+          {% if comment.user == request.user %}
+          <div class="comment-actions">
+          <a href="#" class="edit-btn" data-comment-id="{{ comment.id }}">Edit</a>
+          <a href="{% url 'delete_comment' comment.id %}">Delete</a>
+          </div>
+          <!-- Hidden Edit Form -->
+          <form method="post" action="{% url 'edit_comment' comment.id %}" class="edit-form" id="edit-form-{{ comment.id }}" data-comment-id="{{ comment.id }}" style="display: none;">
+            {% csrf_token %}
+            <textarea name="text" class="edit-textarea" id="comment-text-{{ comment.id }}">{{ comment.text }}</textarea>
+            <button type="submit">Save</button>
+            <button type="button" class="comment-cancel-btn" data-comment-id="{{ comment.id }}">Cancel</button>
+          </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Add a Comment Form -->
+    <form method="post" action="{% url 'add_comment' cocktail.id %}">
+      {% csrf_token %}
+      <textarea class= "comment" name="text" rows="4" cols="50" placeholder="Add a comment..."></textarea>
+      <button type="submit">Post Comment</button>
+    </form>
+  </div>
 
 
   <!-- Edit Cocktail Modal -->
@@ -176,6 +223,7 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -386,5 +434,68 @@
       return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
 
+
+  // Edit Comment
+    // Select all "Edit" buttons
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener("click", function(event) {
+            event.preventDefault();
+            let commentId = this.getAttribute("data-comment-id");
+            let form = document.getElementById(`edit-form-${commentId}`);
+            form.style.display = "block";  // Show form
+        });
+    });
+
+    // Select all "Cancel" buttons
+    document.querySelectorAll('.cancel-btn').forEach(button => {
+        button.addEventListener("click", function(event) {
+            event.preventDefault();
+            let commentId = this.getAttribute("data-comment-id");
+            let form = document.getElementById(`edit-form-${commentId}`);
+            form.style.display = "none";  // Hide form
+        });
+    });
+
+    // Handle form submission via AJAX
+    document.querySelectorAll('.edit-form').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+        let commentId = this.getAttribute("data-comment-id"); // Get comment ID from the form
+        let text = this.querySelector('.edit-textarea').value;  // Get the value of the textarea
+        let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+          
+        let formData = new FormData();
+        formData.append('text', text); 
+
+            fetch(`/comment/edit/${commentId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                const commentTextElement = document.getElementById(`comment-text-${commentId}`);
+
+                if (commentTextElement) {
+                    commentTextElement.innerText = data.new_text;
+                } else {
+                    console.error("Element not found: comment-text-" + commentId);
+                }
+
+                const editForm = document.getElementById(`edit-form-${commentId}`);
+                if (editForm) editForm.classList.add('hidden'); 
+
+                setTimeout(() => location.reload(), 500); 
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
   </script>
   {% endblock %}

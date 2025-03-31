@@ -5,14 +5,15 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, AuthenticationForm, CocktailForm, LoginForm, CollectionForm
-from .models import Cocktail, Ingredient, Step, Collection
+from .forms import SignUpForm, AuthenticationForm, CocktailForm, LoginForm, CollectionForm, CommentForm
+from .models import Cocktail, Ingredient, Step, Collection, Comment
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core import serializers
 from django.urls import reverse_lazy
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt 
 from supabase import create_client, Client
 
 url: str = os.environ.get("SUPABASE_URL")
@@ -194,6 +195,62 @@ def delete_collection(request, id):
 
     return render(request, 'collections/delete_collection.html', {'collection': collection})
 
+# Like or unlike a cocktail
+def like_cocktail(request, cocktail_id):
+    cocktail = get_object_or_404(Cocktail, id=cocktail_id)
+
+    if request.user in cocktail.likes.all():
+        # User has already liked this cocktail, so we remove the like
+        cocktail.likes.remove(request.user)
+    else:
+        # Add the user to the likes list
+        cocktail.likes.add(request.user)
+
+    return redirect('cocktail_detail', cocktail_id=cocktail.id)
+
+# Add a comment
+@login_required
+def add_comment(request, cocktail_id):
+    cocktail = get_object_or_404(Cocktail, id=cocktail_id)
+
+    if request.method == 'POST':
+        text = request.POST.get('text')
+
+        if text and text.strip():
+            comment = Comment.objects.create(user=request.user, text=text, cocktail=cocktail)
+            cocktail.comments.add(comment)
+            cocktail.save()
+            messages.success(request, "Comment added successfully!")
+            return redirect('cocktail_detail', cocktail_id=cocktail.id)
+
+    return redirect('cocktail_detail', cocktail_id=cocktail.id)
+
+#Edit comments
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        comment.text = text
+        comment.save()
+        messages.success(request, "Comment edited successfully!")
+        return JsonResponse({'success': True, 'new_text': comment.text})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+#delete comments
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.user == comment.user:
+        cocktail_id = comment.cocktail.id
+        comment.delete()
+        messages.success(request, "Comment deleted successfully!")
+        return redirect('cocktail_detail', cocktail_id=cocktail_id)
+
+    return redirect('cocktail_detail', cocktail_id=comment.cocktail.id)
 
 # Create Cocktail
 @login_required
@@ -310,11 +367,14 @@ def create_cocktail(request):
 # View cocktail details
 def cocktail_detail(request, cocktail_id):
     cocktail = Cocktail.objects.get(id=cocktail_id)
+    comments = cocktail.comments.all().order_by("created_at")
+
     if request.user.is_authenticated:
         user_collections = Collection.objects.filter(createdBy=request.user)
     else:
         user_collections = []
-    return render(request, 'cocktails/cocktail_detail.html', {'cocktail': cocktail, 'user_collections': user_collections})
+        
+    return render(request, 'cocktails/cocktail_detail.html', {'cocktail': cocktail, 'user_collections': user_collections, 'comments': comments})
     
 # Edit cocktail (only creator can edit)
 @login_required

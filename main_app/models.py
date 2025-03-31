@@ -43,6 +43,7 @@ class Collection(models.Model):
 # Comment Model
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cocktail = models.ForeignKey('Cocktail', on_delete=models.CASCADE, null=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -127,14 +128,14 @@ class Cocktail(models.Model):
     ]
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    ingredients = models.ManyToManyField(Ingredient)  # Many-to-many relationship
-    steps = models.ManyToManyField(Step)  # Many-to-many relationship
-    image_url = models.URLField(blank=True, null=True)  # Store image URL
+    ingredients = models.ManyToManyField(Ingredient)
+    steps = models.ManyToManyField(Step) 
+    image_url = models.URLField(blank=True, null=True)  
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     glass_type = models.CharField(max_length=20, choices=GLASS_TYPE_CHOICES)
     alcoholic = models.BooleanField(default=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_cocktails")
-    likes = models.ManyToManyField(User, related_name="liked_cocktails", blank=True)  # Users who liked
+    likes = models.ManyToManyField(User, related_name="liked_cocktails", blank=True)
     shared = models.BooleanField(default=True)
     comments = models.ManyToManyField(Comment, related_name="cocktail_comments", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

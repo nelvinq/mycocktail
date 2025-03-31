@@ -120,6 +120,119 @@ p {
     color: white;
 }
 
+/* Styling for the comment section */
+.comments .edit-form{
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #181717;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+
+/* Each individual comment */
+.comment {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(34, 34, 34, 0.8);
+    color: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+/* Styling for comment user and text */
+.comment p {
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+#comment-time {
+    display: flex;
+    justify-content: end;
+    font-size: 1rem;
+}
+
+/* Action buttons container */
+.comment-actions {
+    display: flex;
+    justify-content: end;
+}
+
+/* Edit and Delete buttons */
+.comment-actions a {
+    margin-right: 10px;
+    font-size: 1.3rem;
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.comment-actions a:hover {
+    color: #0056b3;
+}
+
+
+/* Hidden form styles */
+.edit-form {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgba(34, 34, 34, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.edit-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 8px;
+    font-size: 14px;
+    color: #fff;
+    background-color: rgba(34, 34, 34, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+}
+
+.comment-cancel-btn {
+    padding: 10px 15px;
+    background-color: #5a6268;
+}
+
+/* Buttons in the edit form */
+.edit-form-actions {
+    margin-top: 10px;
+}
+
+.save-btn, .cancel-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.save-btn {
+    background-color: #28a745;
+    color: #fff;
+    margin-right: 10px;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+
+
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     .cocktail-detail-container {

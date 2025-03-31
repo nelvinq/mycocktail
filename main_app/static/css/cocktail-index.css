@@ -22,7 +22,7 @@ body {
 }
 
 .card {
-  width: 200px;
+  width: 250px;
   margin: 5px;
   border: var(--borders);
   box-shadow: var(--card-box-shadow);
