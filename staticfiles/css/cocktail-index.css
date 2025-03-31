@@ -1,0 +1,93 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.page-header {
+  text-align: center;
+  padding: 20px;
+}
+
+.page-header h1 {
+  font-size: var(--font-xxl);
+  margin: 0;
+}
+
+.card-container {
+  padding: 0 10px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1px; /* Adds space between cards */
+}
+
+.card {
+  width: 200px;
+  margin: 5px;
+  border: var(--borders);
+  box-shadow: var(--card-box-shadow);
+  border-radius: var(--card-border-radius); /* Rounded corners for the card */
+  overflow: hidden; /* Prevents images from spilling outside the card */
+  background-color: var(--bg-color); /* Keeps card background consistent with theme */
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  text-align: left;
+  position: relative;
+}
+
+.remove-button-container {
+  display: flex;
+  justify-content: flex-end; /* Align the button to the right */
+  margin-top: 16px; /* Optional space above the button */
+}
+
+.card-img-container {
+  width: 100%;
+  height: 200px; /* Fixed height for the images */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures images cover the area without distortion */
+}
+
+.card-title {
+  margin: 10px 0;
+  font-size: var(--font-xl);
+  font-weight: bold;
+  color: white;
+}
+
+.card p {
+  font-size: 1.3em;
+  margin: 5px 0;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+.card a {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.card > a {
+  text-decoration: none;
+  color: var(--text-color);
+}
