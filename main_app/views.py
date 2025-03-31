@@ -16,7 +16,7 @@ from django.db.models import Q
 from supabase import create_client, Client
 
 # Initialize Supabase Client
-supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 # Home view
 def home(request):
