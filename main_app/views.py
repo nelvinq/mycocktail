@@ -15,8 +15,9 @@ from django.urls import reverse_lazy
 from django.db.models import Q
 from supabase import create_client, Client
 
-# Initialize Supabase Client
-supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
 
 # Home view
 def home(request):
