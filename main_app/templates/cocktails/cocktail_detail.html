@@ -9,6 +9,7 @@
 <div class="page-header">
   <div class="d-flex">
   <h1>{{ cocktail.name }}</h1>
+  {% if request.user.is_authenticated %}
   <form id="likeForm" data-cocktail-id="{{ cocktail.id }}">
     {% csrf_token %}
       <button type="submit" class="like-btn">
@@ -19,6 +20,7 @@
         {% endif %}
     </button>
   </form>
+  {% endif %}
   </div>
   <div class="page-action">
   {% if request.user == cocktail.creator %}
@@ -125,12 +127,15 @@
     </div>
 
     <!-- Add a Comment Form -->
+    {% if request.user.is_authenticated %}
     <form method="post" action="{% url 'add_comment' cocktail.id %}">
       {% csrf_token %}
       <textarea class= "comment" name="text" rows="4" cols="50" placeholder="Add a comment..."></textarea>
       <button type="submit">Post Comment</button>
     </form>
   </div>
+  {% endif %}
+
 
 
   <!-- Edit Cocktail Modal -->

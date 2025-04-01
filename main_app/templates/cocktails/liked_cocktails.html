@@ -41,6 +41,10 @@
     {% endif %}
 
 <script>
+function viewCocktailDetails(cocktailId) {
+    window.location.href = `/cocktails/${cocktailId}/`;
+}
+
 function toggleLike(event, cocktailId) {
     event.preventDefault();
     event.stopPropagation(); // Prevent triggering card click event
