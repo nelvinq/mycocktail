@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import signup_view, logout_view, home, about, cocktail_index, CustomLoginView,cocktail_detail, edit_cocktail, delete_cocktail, my_cocktails, my_collections, create_collection, edit_collection, add_to_collection, delete_collection, remove_cocktail
+from .views import signup_view, logout_view, home, about, cocktail_index, CustomLoginView,cocktail_detail, edit_cocktail, delete_cocktail, my_cocktails, my_collections, create_collection, edit_collection, add_to_collection, delete_collection, remove_cocktail, liked_cocktails
 from django.contrib.auth.views import LoginView
 
 urlpatterns = [
@@ -19,6 +19,7 @@ urlpatterns = [
     path('comment/edit/<int:comment_id>/', views.edit_comment, name='edit_comment'),
     path('comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
     path('cocktails/my-cocktails', views.my_cocktails, name='my_cocktails'),
+    path('cocktails/liked/', liked_cocktails, name='liked_cocktails'),
     path('my-collections/', my_collections, name='my_collections'),
     path('create-collection/', create_collection, name='create_collection'),
     path('collections/<int:id>/', views.collection_detail, name='collection_detail'),

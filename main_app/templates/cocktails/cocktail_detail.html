@@ -9,8 +9,8 @@
 <div class="page-header">
   <div class="d-flex">
   <h1>{{ cocktail.name }}</h1>
-  <form action="{% url 'like_cocktail' cocktail.id %}" method="post">
-      {% csrf_token %}
+  <form id="likeForm" data-cocktail-id="{{ cocktail.id }}">
+    {% csrf_token %}
       <button type="submit" class="like-btn">
         {% if request.user in cocktail.likes.all %}
             <i class="fas fa-heart"></i> Unlike
@@ -497,5 +497,33 @@
         .catch(error => console.error('Error:', error));
     });
 });
+
+  // Like and Unlike Cocktails
+
+  document.getElementById("likeForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    let cocktailId = this.getAttribute("data-cocktail-id");
+
+    fetch(`/cocktails/${cocktailId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'include',
+    })
+    .then(response => response.json())
+    .then(data => {
+        const likeBtn = document.querySelector("#likeForm button");
+        if (data.liked) {
+            likeBtn.innerHTML = `<i class="fas fa-heart"></i> Unlike`;
+        } else {
+            likeBtn.innerHTML = `<i class="far fa-heart"></i> Like`;
+        }
+    })
+    .catch(error => console.error("Error:", error));
+});
+
   </script>
   {% endblock %}

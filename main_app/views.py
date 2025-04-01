@@ -93,6 +93,12 @@ def my_cocktails(request):
         'alcoholic_filter': alcoholic_filter,
     })
 
+# Liked Cocktail index view
+@login_required
+def liked_cocktails(request):
+    liked_cocktails = Cocktail.objects.filter(likes=request.user)
+    return render(request, 'cocktails/liked_cocktails.html', {'liked_cocktails': liked_cocktails})
+
 # View Collection Details
 @login_required
 def collection_detail(request, id):
@@ -202,11 +208,21 @@ def like_cocktail(request, cocktail_id):
     if request.user in cocktail.likes.all():
         # User has already liked this cocktail, so we remove the like
         cocktail.likes.remove(request.user)
+        liked = False
     else:
         # Add the user to the likes list
         cocktail.likes.add(request.user)
+        liked = True
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # AJAX request
+        return JsonResponse({
+            'liked': liked,
+            'likes_count': cocktail.likes.count(),
+            'status': 'liked' if liked else 'unliked'
+        })
 
     return redirect('cocktail_detail', cocktail_id=cocktail.id)
+
 
 # Add a comment
 @login_required

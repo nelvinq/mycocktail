@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/cocktail-index.css' %}">
+
+<h2>Your Liked Cocktails</h2>
+
+  {% if liked_cocktails %}
+        <section class="card-container">
+            {% for cocktail in liked_cocktails%}
+            <div class="card" id="cocktail-{{ cocktail.id }}" onclick="viewCocktailDetails('{{ cocktail.id }}')">
+              <div class="card-content">
+                  <div class="card-img-container">
+                    {% if cocktail.image_url %}
+                      <img src="{{ cocktail.image_url }}" alt="{{ cocktail.name }}" class="card-img">
+                    {% else %}
+                      <img src="{% static 'images/default-cocktail.jpg' %}" alt="Default Cocktail" class="card-img">
+                    {% endif %}
+                  </div>
+                  <h2 class="card-title">{{ cocktail.name }}</h2>
+                  <p><small>{{ cocktail.description }}</small></p>
+                  <p><strong>Category:</strong> {{ cocktail.category }}</p>
+                  <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
+                  <p><strong>Created by:</strong> {{ cocktail.creator }}</p>
+                  <div class="remove-button-container">
+                    <button type="button" class="like-btn" onclick="toggleLike(event, '{{ cocktail.id }}')">
+                          {% if request.user in cocktail.likes.all %}
+                              <i class="fas fa-heart"></i> Unlike
+                          {% else %}
+                              <i class="far fa-heart"></i> Like
+                          {% endif %}
+                      </button>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+        </section>
+        {% else %}
+            <p style="text-align: center">You haven't liked a cocktail.</p>
+    {% endif %}
+
+<script>
+function toggleLike(event, cocktailId) {
+    event.preventDefault();
+    event.stopPropagation(); // Prevent triggering card click event
+
+    fetch(`/cocktails/${cocktailId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'include', // Ensures cookies are sent for authentication
+    })
+    .then(response => response.json())
+    .then(data => {
+        const likeBtn = document.querySelector(`#cocktail-${cocktailId} .like-btn`);
+        
+        if (data.liked) {
+            likeBtn.innerHTML = `<i class="fas fa-heart"></i> Unlike`;
+        } else {
+            likeBtn.innerHTML = `<i class="far fa-heart"></i> Like`;
+            // Remove unliked cocktail from the list
+            document.getElementById(`cocktail-${cocktailId}`).remove();
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+// Helper function to get CSRF token
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+</script>
+
+{% endblock %}
