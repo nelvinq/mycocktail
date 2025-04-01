@@ -8,15 +8,19 @@ Check out the deployed app here: **[MyCocktail Live](https://mycocktail.onrender
 
 ## 🍹🤵‍♀️ Get Mixing with MyCocktail
 - **Cocktail Browsing:** Users can browse a vast collection of cocktails with detailed descriptions, images, and ingredients.
+![Model](https://github.com/nelvinq/mycocktail/blob/c34aa1227c216981f3e8d618b9f85954d6504bc4/main_app/static/images/feature1.jpg)
 
-- **User Accounts:** Users can sign up, log in, and manage their profiles.
+- **User Accounts:** Users can sign up, log in, and manage their cocktails.
+![Model](https://github.com/nelvinq/mycocktail/blob/c34aa1227c216981f3e8d618b9f85954d6504bc4/main_app/static/images/feature2.jpg)
 
 - **Create Cocktails:** Users can create their own cocktail recipes, share them with others, and edit or delete their own creations.
+![Model](https://github.com/nelvinq/mycocktail/blob/c34aa1227c216981f3e8d618b9f85954d6504bc4/main_app/static/images/feature3.jpg)
 
 - **Like Cocktails:** Users can like or unlike cocktails, with the count of likes displayed dynamically, with a dedicated page to display all the cocktails a user has liked, with the ability to remove likes.
+![Model](https://github.com/nelvinq/mycocktail/blob/c34aa1227c216981f3e8d618b9f85954d6504bc4/main_app/static/images/feature4.jpg)
 
 - **Manage Cocktails in Collections:** Users can organize their favorite cocktails into specialized, personalized collections based on various themes, preferences, or events.
-
+![Model](https://github.com/nelvinq/mycocktail/blob/c34aa1227c216981f3e8d618b9f85954d6504bc4/main_app/static/images/feature5.jpg)
 
 ## 👨‍💻 Project Planning  
 ### User Stories
