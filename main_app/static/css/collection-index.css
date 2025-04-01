@@ -1,84 +1,83 @@
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-  }
-  
-  .page-header {
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .page-header h1 {
-    font-size: var(--font-xxl);
-    margin: 0;
-  }
-  
+/* Page Header */
+.page-header {
+  text-align: center;
+  padding: 20px;
+}
+
+.page-header h1 {
+  font-size: var(--font-xxl);
+  margin: 0;
+}
+
+/* Card Container */
+.card-container {
+  padding: 0 10px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Card Styles */
+.card {
+  flex: 1 1 200px;
+  max-width: 250px;
+  border: var(--borders);
+  box-shadow: var(--card-box-shadow);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  background-color: var(--card-bg-color, #222);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+/* Card Content */
+.card-content {
+  padding: 15px;
+  text-align: left;
+}
+
+/* Card Title */
+.card-title {
+  margin: 10px 0;
+  font-size: var(--font-xl);
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+/* Card Paragraph */
+.card p {
+  font-size: 1.3em;
+  margin: 5px 0;
+}
+
+/* Card Link */
+.card a {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Responsive Design */
+@media only screen and (max-width: 768px) {
   .card-container {
     padding: 0 10px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px; /* Better spacing between cards */
   }
-  
-  .card {
-    flex: 1 1 200px; /* Responsive width */
-    max-width: 250px;
-    border: var(--borders);
-    box-shadow: var(--card-box-shadow);
-    border-radius: var(--card-border-radius);
-    overflow: hidden;
-    background-color: var(--card-bg-color, #222); /* Ensure contrast */
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .card:hover {
-    transform: scale(1.05);
-  }
-  
-  .card-content {
-    padding: 15px;
-    text-align: left;
-  }
-  
 
-  .card-title {
-    margin: 10px 0;
-    font-size: var(--font-xl);
-    font-weight: bold;
-    color: var(--text-color);
-  }
-  
-  .card p {
-    font-size: 1.3em;
-    margin: 5px 0;
-  }
-  
-  .card a {
-    position: absolute;
-    top: 0;
-    left: 0;
+  .card {
     width: 100%;
-    height: 100%;
-    z-index: 1;
+    margin: 10px 0;
   }
-  
-  @media only screen and (max-width: 768px) {
-    .card-container {
-      padding: 0 10px;
-    }
-  
-    .card {
-      width: 100%;
-      margin: 10px 0;
-    }
-  
-    .card-img-container {
-      height: 150px;
-    }
+
+  .card-img-container {
+    height: 150px;
   }
-  
+}

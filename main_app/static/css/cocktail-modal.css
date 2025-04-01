@@ -1,4 +1,4 @@
-/* Modal and Content */
+/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -10,9 +10,9 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-}
-
-.modal-content {
+  }
+  
+  .modal-content {
     background-color: rgba(8, 8, 8, 0.9);
     padding: 20px;
     border-radius: 10px;
@@ -21,46 +21,49 @@
     box-sizing: border-box;
     max-height: 90%;
     overflow-y: auto;
-}
-
-/* Modal Heading Styles */
-h3, h4 {
+  }
+  
+  /* Modal Heading Styles */
+  h3, h4 {
     font-size: 1.6em;
     margin-bottom: 10px;
-}
-
-h3 {
+  }
+  
+  h3 {
     text-align: center;
-}
-
-/* Label and Input Styles */
-label {
+  }
+  
+  /* Label and Input Styles */
+  label {
     font-size: 1.5em;
     margin: 10px 0 5px;
     display: block;
-}
-
-input[type="text"], input[type="file"], textarea, select {
+  }
+  
+  input[type="text"],
+  input[type="file"],
+  textarea,
+  select {
     font-size: 1.3em;
     padding: 10px;
     width: 100%;
     box-sizing: border-box;
     border-radius: 5px;
     border: 1px solid #ccc;
-    margin-bottom: 0px;
-}
-
-textarea {
+    margin-bottom: 0;
+  }
+  
+  textarea {
     height: 100px;
     font-size: 1.6em;
-}
-
-input[type="checkbox"] {
+  }
+  
+  input[type="checkbox"] {
     margin-right: 10px;
-}
-
-/* Button Styles */
-button {
+  }
+  
+  /* Button Styles */
+  button {
     font-size: 1.3em;
     padding: 10px 15px;
     background-color: #b70f0f;
@@ -69,26 +72,25 @@ button {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
-}
-
-button:hover {
+  }
+  
+  button:hover {
     background-color: #e63900;
-}
-
-/* List and Item Styles */
-.sortable {
+  }
+  
+  /* List and Item Styles */
+  .sortable {
     list-style-type: none;
     padding: 0;
-    margin: 10px 0px;
+    margin: 10px 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
     overflow-y: auto;
     max-height: 300px;
-}
-
-.sortable-item {
-
+  }
+  
+  .sortable-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -99,16 +101,16 @@ button:hover {
     border: 1px solid #444;
     width: 100%;
     box-sizing: border-box;
-}
-
-.sortable-item input,
-.sortable-item select {
+  }
+  
+  .sortable-item input,
+  .sortable-item select {
     flex: 1;
     padding: 6px 8px;
     font-size: 1.2rem;
-}
-
-.sortable-item button.remove-btn {
+  }
+  
+  .sortable-item button.remove-btn {
     width: 30px;
     height: 30px;
     background-color: red;
@@ -120,130 +122,109 @@ button:hover {
     text-align: center;
     line-height: 30px;
     font-size: 16px;
-}
-
-.sortable-item button.remove-btn:hover {
+  }
+  
+  .sortable-item button.remove-btn:hover {
     background-color: #cc0000;
-}
-
-/* Ingredient and Optional Groups */
-.ingredient-group, .optional-group {
+  }
+  
+  /* Ingredient and Optional Groups */
+  .ingredient-group,
+  .optional-group {
     display: flex;
     gap: 5px;
     align-items: center;
     margin-bottom: 0;
-}
-
-.optional-group label {
+  }
+  
+  .optional-group label {
     font-size: 1rem;
-}
-
-/* Steps List */
-#steps-list {
+  }
+  
+  /* Steps List */
+  #steps-list,
+  #edit-steps-list {
     list-style-type: none;
     padding: 0;
     margin: 0;
     width: 100%;
-}
-
-#steps-list .sortable-item {
+  }
+  
+  #steps-list .sortable-item,
+  #edit-steps-list .sortable-item {
     width: 100%;
     margin-bottom: 10px;
     box-sizing: border-box;
-}
-
-#steps-list input {
+  }
+  
+  #steps-list input,
+  #edit-steps-list input {
     width: 100%;
     padding: 6px 8px;
     font-size: 1.2rem;
     border-radius: 5px;
     border: 1px solid #ccc;
-}
-
-#edit-steps-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-}
-
-#edit-steps-list .sortable-item {
-    width: 100%;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-#edit-steps-list input {
-    width: 100%;
-    padding: 6px 8px;
-    font-size: 1.2rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-/* Modal Close Button */
-.close {
+  }
+  
+  /* Modal Close Button */
+  .close,
+  .closeEdit {
     font-size: 2em;
     color: #aaa;
     cursor: pointer;
     position: absolute;
     top: 15px;
     right: 25px;
-}
-
-.closeEdit{
-    font-size: 2em;
-    color: #aaa;
-    cursor: pointer;
-    position: absolute;
-    top: 15px;
-    right: 25px;
-}
-
-.close:hover, .close:focus {
+  }
+  
+  .close:hover,
+  .close:focus,
+  .closeEdit:hover,
+  .closeEdit:focus {
     color: black;
     text-decoration: none;
-}
-
-/* Form Styles */
-form {
+  }
+  
+  /* Form Styles */
+  form {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-}
-
-button[type="submit"] {
+  }
+  
+  button[type="submit"] {
     margin-top: 20px;
     background-color: #b70f0f;
     align-self: flex-end;
-}
-
-button[type="submit"]:hover {
+  }
+  
+  button[type="submit"]:hover {
     background-color: #e63900;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
+  }
+  
+  /* Responsive Design */
+  @media screen and (max-width: 768px) {
     .modal-content {
-        width: 80%;
+      width: 80%;
     }
-
+  
     button {
-        font-size: 1.3em;
-        padding: 8px 12px;
+      font-size: 1.3em;
+      padding: 8px 12px;
     }
-}
-
-/* Scrollbar Styling */
-.modal-content::-webkit-scrollbar {
+  }
+  
+  /* Scrollbar Styling */
+  .modal-content::-webkit-scrollbar {
     width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
+  }
+  
+  .modal-content::-webkit-scrollbar-thumb {
     background-color: rgba(85, 85, 85, 0.3);
     border-radius: 5px;
-}
-
-.modal-content::-webkit-scrollbar-track {
+  }
+  
+  .modal-content::-webkit-scrollbar-track {
     background-color: transparent;
-}
+  }
+  
