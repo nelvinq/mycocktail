@@ -16,7 +16,6 @@
 
   <form method="post" action="{% url 'login' %}" autocomplete="off">
     {% csrf_token %}
-    <!-- Login form fields -->
     <label for="username">Username:</label>
     <input type="text" name="username" required>
 
@@ -25,9 +24,6 @@
 
     <button type="submit">Login</button>
   </form>
-  <!-- Display error messages -->
-
-
 
   <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
 </div>

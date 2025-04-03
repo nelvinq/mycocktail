@@ -6,34 +6,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shared Cocktails</title>
-
-    <!-- Link to the CSS file -->
-    <link rel="stylesheet" href="{% static 'css/cocktail-index.css' %}">
-    <style>
-      .card-title {
-          display: -webkit-box;               
-          -webkit-box-orient: vertical;       
-          -webkit-line-clamp: 2;
-          line-clamp: 2;
-          overflow: hidden;                   
-          text-overflow: ellipsis;
-          min-height: 1.5em;                  
-          white-space: normal;
-      }
-      .card-description {
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 3;
-          line-clamp: 3;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          height: 4em; 
-        }
-  </style>
 </head>
 <body>
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/cocktail-index.css' %}">
 
 <section class="card-container">
   {% for cocktail in cocktails %}

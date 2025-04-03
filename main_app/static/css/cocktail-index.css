@@ -34,6 +34,26 @@ body {
   transition: transform 0.2s ease-in-out;
 }
 
+.card-title {
+  display: -webkit-box;               
+  -webkit-box-orient: vertical;       
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;                   
+  text-overflow: ellipsis;
+  min-height: 1.5em;                  
+  white-space: normal;
+}
+.card-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 4em; 
+}
+
 .card-content {
   display: flex;
   flex-direction: column;

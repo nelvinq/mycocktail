@@ -4,42 +4,42 @@
 <link rel="stylesheet" href="{% static 'css/cocktail-detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/cocktail-modal.css' %}">
 
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+  <li class="{{ message.tags }}">{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
 <button onclick="history.back()" class="btn btn-secondary">Back</button>
 
 <div class="page-header">
   <div class="d-flex">
-  <h1>{{ cocktail.name }}</h1>
-  {% if request.user.is_authenticated %}
-  <form id="likeForm" data-cocktail-id="{{ cocktail.id }}">
-    {% csrf_token %}
+    <h1>{{ cocktail.name }}</h1>
+    {% if request.user.is_authenticated %}
+    <form id="likeForm" data-cocktail-id="{{ cocktail.id }}">
+      {% csrf_token %}
       <button type="submit" class="like-btn">
         {% if request.user in cocktail.likes.all %}
-            <i class="fas fa-heart"></i> Unlike
+        <i class="fas fa-heart"></i> Unlike
         {% else %}
-            <i class="far fa-heart"></i> Like
+        <i class="far fa-heart"></i> Like
         {% endif %}
-    </button>
-  </form>
-  {% endif %}
+      </button>
+    </form>
+    {% endif %}
   </div>
+
   <div class="page-action">
-  {% if request.user == cocktail.creator %}
-  <!-- Action Buttons: Edit and Delete -->
-  <div class="action-buttons">
+    {% if request.user == cocktail.creator %}
+    <div class="action-buttons">
       <a href="#" class="btn btn-primary" id="openEditModalBtn" data-cocktail-id="{{ cocktail.id }}">Edit Cocktail</a>
       <a href="{% url 'delete_cocktail' cocktail.id %}" class="btn btn-danger">Delete Cocktail</a>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
   </div>
-</div>
-
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
 
 <div class="container cocktail-detail-container">
   <div class="cocktail-image">
@@ -49,111 +49,106 @@
     <img src="{% static 'images/default-cocktail.jpg' %}" alt="Default Cocktail" class="detail-card-img">
     {% endif %}
     {% if request.user.is_authenticated %}
-<!-- Add to Collection Form -->
-<form method="POST" action="{% url 'add_to_collection' cocktail.id %}" class="add-to-collection-form">
-  {% csrf_token %}
-  <label for="collection">Add to Collection:</label>
-  <div class="collection-select-wrapper">
-    {% if user_collections %}
-      <!-- If the user has collections, show the select dropdown -->
-      <select name="collection_id" id="collection">
-        {% for collection in user_collections %}
+
+    <form method="POST" action="{% url 'add_to_collection' cocktail.id %}" class="add-to-collection-form">
+      {% csrf_token %}
+      <label for="collection">Add to Collection:</label>
+      <div class="collection-select-wrapper">
+        {% if user_collections %}
+        <select name="collection_id" id="collection">
+          {% for collection in user_collections %}
           <option value="{{ collection.id }}">{{ collection.name }}</option>
-        {% endfor %}
-      </select>
-      <button type="submit" class="btn btn-primary">Add</button>
-    {% else %}
-      <p>You don't have any collections yet. <a href="{% url 'create_collection' %}">Create one now</a>.</p>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Add</button>
+        {% else %}
+        <p>You don't have any collections yet. <a href="{% url 'create_collection' %}">Create one now</a>.</p>
+        {% endif %}
+      </div>
+    </form>
     {% endif %}
-</div>
-</form>
-{% endif %}
-</div>
+  </div>
 
   <div class="cocktail-details">
-
+  
     <div class="cocktail-detail">
       <p><strong>Description:</strong><span class="cocktail-value">{{ cocktail.description }}</span></p>
       <p><strong>Category:</strong><span class="cocktail-value">{{ cocktail.category }}</span></p>
       <p><strong>Glass Type:</strong><span class="cocktail-value">{{ cocktail.glass_type }}</span></p>
-      <p><strong>Alcoholic:</strong><span class="cocktail-value">{% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</span></p>
+      <p><strong>Alcoholic:</strong><span class="cocktail-value">{% if cocktail.alcoholic %} Yes {% else %} No {% endif%}</span></p>
       <p><strong>Shared to Public:</strong><span class="cocktail-value">{% if cocktail.shared %} Yes {% else %} No {% endif %}</span></p>
     </div>
     <hr class="styled-line">
     <p><strong>Ingredients:</strong></p>
     <ul>
       {% for ingredient in cocktail.ingredients.all %}
-        <li>{{ ingredient.name }} - {{ ingredient.amount }} {{ ingredient.unit }}
-          {% if ingredient.garnish %}(Garnish){% endif %}
-          {% if ingredient.optional %}(Optional){% endif %}
-        </li>
+      <li>{{ ingredient.name }} - {{ ingredient.amount }} {{ ingredient.unit }}
+        {% if ingredient.garnish %}(Garnish){% endif %}
+        {% if ingredient.optional %}(Optional){% endif %}
+      </li>
       {% endfor %}
     </ul>
     <p><strong>Instructions:</strong></p>
     <ol>
       {% for step in cocktail.steps.all %}
-        <li>{{ step }}</li>
+      <li>{{ step }}</li>
       {% endfor %}
     </ol>
   </div>
-</div>
+  </div>
 
-    <!-- Comments Section -->
     <h2>Comments</h2>
-  {% if comments.count == 0 %}
-      <p>No comments available.</p>
+    {% if comments.count == 0 %}
+    <p>No comments available.</p>
     {% else %}
     <div class="comments">
       {% for comment in comments %}
-        <div class="comment">
-          <p><strong>{{ comment.user.username }}:</strong> {{ comment.text }}</p>
-          <p id="comment-time">{{ comment.created_at }}</p>
-          {% if comment.user == request.user %}
-          <div class="comment-actions">
+      <div class="comment">
+        <p><strong>{{ comment.user.username }}:</strong> {{ comment.text }}</p>
+        <p id="comment-time">{{ comment.created_at }}</p>
+        {% if comment.user == request.user %}
+        <div class="comment-actions">
           <a href="#" class="edit-btn" data-comment-id="{{ comment.id }}">Edit</a>
           <a href="{% url 'delete_comment' comment.id %}">Delete</a>
-          </div>
-          <!-- Hidden Edit Form -->
-          <form method="post" action="{% url 'edit_comment' comment.id %}" class="edit-form" id="edit-form-{{ comment.id }}" data-comment-id="{{ comment.id }}" style="display: none;">
-            {% csrf_token %}
-            <textarea name="text" class="edit-textarea" id="comment-text-{{ comment.id }}">{{ comment.text }}</textarea>
-            <button type="submit">Save</button>
-            <button type="button" class="comment-cancel-btn" data-comment-id="{{ comment.id }}">Cancel</button>
-          </form>
+        </div>
+        <form method="post" action="{% url 'edit_comment' comment.id %}" class="edit-form" id="edit-form-{{ comment.id }}"
+          data-comment-id="{{ comment.id }}" style="display: none;">
+          {% csrf_token %}
+          <textarea name="text" class="edit-textarea" id="comment-text-{{ comment.id }}">{{ comment.text }}</textarea>
+          <button type="submit">Save</button>
+          <button type="button" class="comment-cancel-btn" data-comment-id="{{ comment.id }}">Cancel</button>
+        </form>
         {% endif %}
       </div>
       {% endfor %}
       {% endif %}
     </div>
 
-    <!-- Add a Comment Form -->
     {% if request.user.is_authenticated %}
     <form method="post" action="{% url 'add_comment' cocktail.id %}">
       {% csrf_token %}
-      <textarea class= "comment" name="text" rows="4" cols="50" placeholder="Add a comment..."></textarea>
+      <textarea class="comment" name="text" rows="4" cols="50" placeholder="Add a comment..."></textarea>
       <button type="submit">Post Comment</button>
     </form>
-  </div>
-  {% endif %}
+    </div>
+    {% endif %}
 
 
-
-  <!-- Edit Cocktail Modal -->
   <div id="editCocktailModal" class="modal">
     <div class="modal-content">
       <span class="closeEdit">&times;</span>
       <h3>Edit Cocktail</h3>
-
+  
       <form id="editCocktailForm" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" id="cocktail_id" name="id">
-
+  
         <label for="edit_name">Cocktail Name:</label>
         <input type="text" id="edit_name" name="name" required>
-
+  
         <label for="edit_description">Description:</label>
         <textarea id="edit_description" name="description"></textarea>
-
+  
         <label for="edit_category">Category:</label>
         <select id="edit_category" name="category">
           <option value="Classic">Classic Cocktails</option>
@@ -170,7 +165,7 @@
           <option value="Champagne">Champagne & Sparkling Cocktails</option>
           <option value="Mocktail">Mocktails</option>
         </select>
-
+  
         <label for="edit_glass_type">Glass Type:</label>
         <select id="edit_glass_type" name="glass_type">
           <option value="Bowl">Bowl</option>
@@ -194,35 +189,32 @@
           <option value="Tiki">Tiki</option>
           <option value="Wine Glass">Wine Glass</option>
         </select>
-
+  
         <label for="edit_alcoholic">Alcoholic:</label>
         <input type="checkbox" id="edit_alcoholic" name="alcoholic">
-
+  
         <label for="edit_shared">Share to Public:</label>
         <input type="checkbox" id="edit_shared" name="shared">
-
+  
         <label for="edit_image">Upload Image:</label>
         <input type="file" id="edit_image" name="image">
-
+  
         <div id="editImagePreviewContainer" style="display: none;">
           <h4>Image Preview:</h4>
-          <img id="editImagePreview" src="" alt="Selected Image Preview" style="max-width: 150px; height: 150px; border-radius: 8px;">
+          <img id="editImagePreview" src="" alt="Selected Image Preview"
+            style="max-width: 150px; height: 150px; border-radius: 8px;">
         </div>
-
-        <!-- Ingredients Section -->
+  
         <h4>Ingredients</h4>
         <ul id="edit-ingredients-list" class="sortable">
-          <!-- Ingredients will be added dynamically -->
         </ul>
         <button type="button" id="addEditIngredientBtn">+ Add Ingredient</button>
-
-        <!-- Steps Section -->
+  
         <h4>Steps</h4>
         <ul id="edit-steps-list" class="sortable">
-          <!-- Steps will be added dynamically -->
         </ul>
         <button type="button" id="addEditStepBtn">+ Add Step</button>
-
+  
         <button type="submit">Save Cocktail</button>
       </form>
     </div>
@@ -267,12 +259,12 @@
         if (file) {
           const reader = new FileReader();
           reader.onload = function (e) {
-            imagePreviewContainer.style.display = 'block'; // Show the preview section
-            imagePreview.src = e.target.result; // Set the preview image source
+            imagePreviewContainer.style.display = 'block';
+            imagePreview.src = e.target.result;
           };
           reader.readAsDataURL(file);
         } else {
-          imagePreviewContainer.style.display = 'none'; // Hide preview if no file selected
+          imagePreviewContainer.style.display = 'none';
         }
       });
 
@@ -280,11 +272,10 @@
 
 
     function openEditModal(cocktailId) {
-      fetch(`/cocktails/${cocktailId}/edit/`)  // Fetch the cocktail data to populate the form
+      fetch(`/cocktails/${cocktailId}/edit/`)
         .then(response => response.json())
         .then(data => {
           if (data.cocktail) {
-            // Populate fields with existing data
             document.getElementById("cocktail_id").value = data.cocktail.id;
             document.getElementById("edit_name").value = data.cocktail.name;
             document.getElementById("edit_description").value = data.cocktail.description;
@@ -293,7 +284,6 @@
             document.getElementById("edit_alcoholic").checked = data.cocktail.alcoholic;
             document.getElementById("edit_shared").checked = data.cocktail.shared;
 
-            // Populate ingredients
             const ingredientsList = document.getElementById("edit-ingredients-list");
             data.cocktail.ingredients.forEach((ingredient) => {
               const li = document.createElement("li");
@@ -331,7 +321,6 @@
               ingredientsList.appendChild(li);
             });
 
-            // Populate steps
             const stepsList = document.getElementById("edit-steps-list");
             data.cocktail.steps.forEach((step) => {
               const li = document.createElement("li");
@@ -351,7 +340,6 @@
         .catch(error => console.error("Error:", error));
     }
 
-    // Add ingredient dynamically to the list in the modal (same as in create cocktail)
     const addEditIngredientBtn = document.getElementById("addEditIngredientBtn");
     addEditIngredientBtn.addEventListener("click", function () {
       const li = document.createElement("li");
@@ -389,7 +377,6 @@
       document.getElementById("edit-ingredients-list").appendChild(li);
     });
 
-    // Add steps dynamically (same as in create cocktail)
     const addEditStepBtn = document.getElementById("addEditStepBtn");
     addEditStepBtn.addEventListener("click", function () {
       const li = document.createElement("li");
@@ -401,15 +388,12 @@
       document.getElementById("edit-steps-list").appendChild(li);
     });
 
-    // Remove Item (for Ingredients & Steps)
     document.addEventListener("click", function (e) {
       if (e.target.classList.contains("remove-btn")) {
         e.target.parentElement.remove();
       }
     });
 
-
-    // Submit the form via AJAX for editing
       document.getElementById("editCocktailForm").addEventListener("submit", function (event) {
         event.preventDefault();
         let formData = new FormData(this);
@@ -426,7 +410,7 @@
         .then(data => {
           if (data.message) {
             alert("Cocktail Updated Successfully!");
-            window.location.reload();  // Reload the page or update the UI
+            window.location.reload();
           } else {
             alert("Error: " + data.error);
           }
@@ -434,40 +418,34 @@
         .catch(error => console.error("Error:", error));
     });
 
-    // CSRF Token function
     function getCSRFToken() {
       return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
 
-
-  // Edit Comment
-    // Select all "Edit" buttons
     document.querySelectorAll('.edit-btn').forEach(button => {
         button.addEventListener("click", function(event) {
             event.preventDefault();
             let commentId = this.getAttribute("data-comment-id");
             let form = document.getElementById(`edit-form-${commentId}`);
-            form.style.display = "block";  // Show form
+            form.style.display = "block";
         });
     });
 
-    // Select all "Cancel" buttons
     document.querySelectorAll('.cancel-btn').forEach(button => {
         button.addEventListener("click", function(event) {
             event.preventDefault();
             let commentId = this.getAttribute("data-comment-id");
             let form = document.getElementById(`edit-form-${commentId}`);
-            form.style.display = "none";  // Hide form
+            form.style.display = "none";
         });
     });
 
-    // Handle form submission via AJAX
     document.querySelectorAll('.edit-form').forEach(form => {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
-        let commentId = this.getAttribute("data-comment-id"); // Get comment ID from the form
-        let text = this.querySelector('.edit-textarea').value;  // Get the value of the textarea
+        let commentId = this.getAttribute("data-comment-id");
+        let text = this.querySelector('.edit-textarea').value; 
         let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
           
         let formData = new FormData();
@@ -503,7 +481,6 @@
     });
 });
 
-  // Like and Unlike Cocktails
 
   document.getElementById("likeForm").addEventListener("submit", function(event) {
     event.preventDefault();

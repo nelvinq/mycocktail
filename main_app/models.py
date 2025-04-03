@@ -10,37 +10,34 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-# User model definition
 class User(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     email = models.EmailField(blank=True, null=True)
     createdCocktails = models.ManyToManyField('Cocktail', related_name='creators', blank=True)
-    collections = models.JSONField(blank=True, null=True)  # Assuming CollectionSchema can be represented as JSON
+    collections = models.JSONField(blank=True, null=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['password']  # Required fields for user creation
+    REQUIRED_FIELDS = ['password']
 
     def __str__(self):
         return self.username
 
-# Collection Model
 class Collection(models.Model):
-    name = models.CharField(max_length=255)  # Name of the collection
+    name = models.CharField(max_length=255) 
     description = models.TextField(null=True, blank=True)
-    cocktails = models.ManyToManyField('Cocktail', related_name='collections')  # List of cocktails in the collection
-    shared = models.BooleanField(default=False)  # Whether the collection is shared
-    createdBy = models.ForeignKey('User', related_name='created_collections', on_delete=models.CASCADE)  # User who created the collection
-    createdAt = models.DateTimeField(auto_now_add=True)  # Timestamp for when the collection was created
+    cocktails = models.ManyToManyField('Cocktail', related_name='collections')
+    shared = models.BooleanField(default=False)
+    createdBy = models.ForeignKey('User', related_name='created_collections', on_delete=models.CASCADE)
+    createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
-# Comment Model
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cocktail = models.ForeignKey('Cocktail', on_delete=models.CASCADE, null=True)
@@ -50,7 +47,6 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.username} on {self.created_at}"
 
-# Ingredient Model
 class Ingredient(models.Model):
     UNIT_CHOICES = [
         ('oz', 'Ounce (oz)'),
@@ -68,25 +64,23 @@ class Ingredient(models.Model):
         ('none', 'None'),
     ]
     
-    name = models.CharField(max_length=255)  # Name of the ingredient (e.g., "Lemon Juice")
-    amount = models.CharField(max_length=255)  # Amount (e.g., "2", "1/2")
-    unit = models.CharField(max_length=10, choices=UNIT_CHOICES)  # Unit (e.g., oz, tbsp, etc.)
-    garnish = models.BooleanField(default=False)  # Whether it's used as a garnish
-    optional = models.BooleanField(default=False)  # Whether it's optional in the recipe
+    name = models.CharField(max_length=255)
+    amount = models.CharField(max_length=255)
+    unit = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    garnish = models.BooleanField(default=False)
+    optional = models.BooleanField(default=False)
     
     def __str__(self):
         optional_str = " (Optional)" if self.optional else ""
         garnish_str = " (Garnish)" if self.garnish else ""
         return f"{self.amount} {self.unit} of {self.name}{optional_str}{garnish_str}"
 
-# Step Model
 class Step(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return self.description  # Ensure it returns a string for each step
+        return self.description
 
-# Cocktail Model
 class Cocktail(models.Model):
     CATEGORY_CHOICES = [
         ('Classic', 'Classic Cocktails'),
@@ -151,7 +145,6 @@ class Cocktail(models.Model):
         return self.comments.count()
         
     def to_dict(self):
-        # Collect data into a dictionary
         return {
             'id': self.id,
             'name': self.name,
@@ -162,7 +155,7 @@ class Cocktail(models.Model):
             'category': self.category,
             'glass_type': self.glass_type,
             'alcoholic': self.alcoholic,
-            'creator': self.creator.username,  # assuming you want the username of the creator
+            'creator': self.creator.username,
             'like_count': self.like_count(),
             'comment_count': self.comment_count(),
             'likes': [user.username for user in self.likes.all()],

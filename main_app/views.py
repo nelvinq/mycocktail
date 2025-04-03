@@ -22,7 +22,7 @@ supabase: Client = create_client(url, key)
 
 # Home view
 def home(request):
-    shared_cocktails = Cocktail.objects.filter(shared=True)  # Reuse the same query
+    shared_cocktails = Cocktail.objects.filter(shared=True)
     return render(request, 'cocktails/browse.html', {'cocktails': shared_cocktails})
 
 # About view
@@ -47,9 +47,8 @@ def browse(request):
     category_filter = request.GET.get('category', '')
     alcoholic_filter = request.GET.get('alcoholic', '')
 
-    # Get shared cocktails and apply search filters
     cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
-    shared_cocktails = cocktails.filter(shared=True)  # Filter for shared cocktails only
+    shared_cocktails = cocktails.filter(shared=True)
 
     return render(request, 'cocktails/browse.html', {
         'cocktails': shared_cocktails,
@@ -64,9 +63,8 @@ def cocktail_index(request):
     category_filter = request.GET.get('category', '')
     alcoholic_filter = request.GET.get('alcoholic', '')
 
-    # Get shared cocktails and apply search filters
     cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
-    shared_cocktails = cocktails.filter(shared=True)  # Filter for shared cocktails only
+    shared_cocktails = cocktails.filter(shared=True)
 
     return render(request, 'cocktails/browse.html', {
         'cocktails': shared_cocktails,
@@ -82,7 +80,6 @@ def my_cocktails(request):
     category_filter = request.GET.get('category', '')
     alcoholic_filter = request.GET.get('alcoholic', '')
 
-    # Get cocktails created by the user and apply search filters
     cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
     user_cocktails = cocktails.filter(creator=request.user)
 
@@ -108,10 +105,8 @@ def collection_detail(request, id):
     category_filter = request.GET.get('category', '')
     alcoholic_filter = request.GET.get('alcoholic', '')
 
-    # Get all cocktails in the collection
     cocktails = collection.cocktails.all()
 
-    # Use search_cocktails to apply filtering within this collection
     filtered_cocktails = search_cocktails(search_query, category_filter, alcoholic_filter).filter(id__in=cocktails.values_list('id', flat=True))
 
     return render(request, 'collections/collection_detail.html', {
@@ -121,7 +116,6 @@ def collection_detail(request, id):
         'category_filter': category_filter,
         'alcoholic_filter': alcoholic_filter,
     })
-
 
 # My Collection View
 @login_required
@@ -143,7 +137,6 @@ def create_collection(request):
         form = CollectionForm()
     return render(request, 'collections/create_collection.html', {'form': form})
 
-
 # Edit Collection View
 @login_required
 def edit_collection(request, collection_id):
@@ -161,10 +154,10 @@ def edit_collection(request, collection_id):
 @login_required
 def add_to_collection(request, cocktail_id):
     cocktail = get_object_or_404(Cocktail, id=cocktail_id)
-    user_collections = Collection.objects.filter(createdBy=request.user)  # Get the user's collections
+    user_collections = Collection.objects.filter(createdBy=request.user)
 
     if request.method == "POST":
-        collection_id = request.POST.get("collection_id")  # Get selected collection
+        collection_id = request.POST.get("collection_id")
         collection = get_object_or_404(Collection, id=collection_id)
 
         if cocktail in collection.cocktails.all():
@@ -173,14 +166,13 @@ def add_to_collection(request, cocktail_id):
             collection.cocktails.add(cocktail)
             messages.success(request, "Cocktail added to collection successfully!")
 
-        return redirect('cocktail_detail', cocktail_id=cocktail.id)  # Redirect back to cocktail detail page
+        return redirect('cocktail_detail', cocktail_id=cocktail.id)
 
     return render(request, 'cocktails/add_to_collection.html', {
         'cocktail': cocktail,
         'user_collections': user_collections
     })
 
-# Remove from Collection View
 login_required
 def remove_cocktail(request, cocktail_id):
     if request.method == 'DELETE':
@@ -189,7 +181,6 @@ def remove_cocktail(request, cocktail_id):
         return JsonResponse({'message': 'Cocktail removed successfully'}, status=200)
     return JsonResponse({'message': 'Invalid request'}, status=400)
 
-# Delete Collection View
 @login_required
 def delete_collection(request, id):
     collection = get_object_or_404(Collection, id=id)
@@ -197,24 +188,21 @@ def delete_collection(request, id):
     if request.method == "POST":
         collection.delete()
         messages.success(request, "Collection deleted successfully!")
-        return redirect('my_collections')  # Redirect back to the list of collections
+        return redirect('my_collections')
 
     return render(request, 'collections/delete_collection.html', {'collection': collection})
 
-# Like or unlike a cocktail
 def like_cocktail(request, cocktail_id):
     cocktail = get_object_or_404(Cocktail, id=cocktail_id)
 
     if request.user in cocktail.likes.all():
-        # User has already liked this cocktail, so we remove the like
         cocktail.likes.remove(request.user)
         liked = False
     else:
-        # Add the user to the likes list
         cocktail.likes.add(request.user)
         liked = True
 
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({
             'liked': liked,
             'likes_count': cocktail.likes.count(),
@@ -222,7 +210,6 @@ def like_cocktail(request, cocktail_id):
         })
 
     return redirect('cocktail_detail', cocktail_id=cocktail.id)
-
 
 # Add a comment
 @login_required
@@ -255,7 +242,7 @@ def edit_comment(request, comment_id):
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
-#delete comments
+#Delete comments
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
@@ -273,56 +260,47 @@ def delete_comment(request, comment_id):
 def create_cocktail(request):
     if request.method == "POST":
         try:
-            # Parse JSON data from the request
-            # Determine if the request is JSON or Form Data
             if request.content_type == "application/json":
-                data = json.loads(request.body)  # Handle JSON request
+                data = json.loads(request.body)
             else:
-                data = request.POST  # Handle form data
+                data = request.POST
 
-            # Extract basic data
             name = data.get("name")
             description = data.get("description", "")
             category = data.get("category")
             glass_type = data.get("glass_type")
             alcoholic = data.get("alcoholic", True)
-            if isinstance(alcoholic, str):  # Handle form-data case
+            if isinstance(alcoholic, str):
                 alcoholic = alcoholic.lower() in ["true", "1", "yes", "on"] 
  
             shared = data.get("shared", True)
-            if isinstance(shared, str):  # Handle form-data case
+            if isinstance(shared, str):
                 shared = shared.lower() in ["true", "1", "yes", "on"] 
 
-            steps_data = request.POST.getlist('steps[]')  # Get the steps from the form
+            steps_data = request.POST.getlist('steps[]')
             steps = [Step.objects.create(description=step_desc) for step_desc in steps_data]
 
-            # Handle Image Upload
             image_url = None
             if "image" in request.FILES:
-                image = request.FILES["image"]  # InMemoryUploadedFile
+                image = request.FILES["image"]
                 
-                # Generate unique file path for storage
                 file_path = f"cocktail_images/{request.user.username}/{image.name}"
 
-                # Read file content and determine MIME type
                 file_content = image.read()
                 content_type = mimetypes.guess_type(image.name)[0] or "application/octet-stream"
 
                 try:
-                    # Upload to Supabase Storage
                     res = supabase.storage.from_("cocktail-images").upload(
                         path=file_path,
                         file=file_content,
                         file_options={"content-type": content_type}
                     )
 
-                    # Get Public URL of uploaded image
                     image_url = supabase.storage.from_("cocktail-images").get_public_url(file_path)
 
                 except Exception as e:
                     return JsonResponse({"error": f"Failed to upload image: {str(e)}"}, status=400)
 
-            # Create the cocktail instance
             cocktail = Cocktail.objects.create(
                 name=name,
                 description=description,
@@ -330,11 +308,10 @@ def create_cocktail(request):
                 glass_type=glass_type,
                 alcoholic=alcoholic,
                 shared=shared,
-                creator=request.user,  # Assign the creator
+                creator=request.user,
                 image_url=image_url,
             )
 
-            # Process and save ingredients
             ingredient_list = data.get("ingredients", [])
             if not ingredient_list and request.POST.getlist('ingredients_name[]'):
                 ingredient_list = []
@@ -353,7 +330,6 @@ def create_cocktail(request):
                         "optional": optionals[i].lower() in ["true", "1", "yes", "on"],
                     })
 
-            # Save ingredients to DB
             for ingredient_data in ingredient_list:
                 ingredient = Ingredient.objects.create(
                     name=ingredient_data["name"],
@@ -364,10 +340,9 @@ def create_cocktail(request):
                 )
                 cocktail.ingredients.add(ingredient)
 
-            # Set the steps for the cocktail
             cocktail.steps.set(steps) 
 
-            cocktail.save()  # Save final cocktail with ingredients
+            cocktail.save()
 
             return JsonResponse({"message": "Cocktail created successfully!"}, status=201)
 
@@ -392,15 +367,13 @@ def cocktail_detail(request, cocktail_id):
         
     return render(request, 'cocktails/cocktail_detail.html', {'cocktail': cocktail, 'user_collections': user_collections, 'comments': comments})
     
-# Edit cocktail (only creator can edit)
+# Edit cocktail
 @login_required
 def edit_cocktail(request, cocktail_id):
     try:
-        # Retrieve the cocktail object
         cocktail = Cocktail.objects.get(id=cocktail_id)
 
         if request.method == 'GET':
-            # Prepare cocktail data to return as a response
             cocktail_data = {
                 'id': cocktail.id,
                 'name': cocktail.name,
@@ -423,7 +396,6 @@ def edit_cocktail(request, cocktail_id):
             return JsonResponse({'cocktail': cocktail_data})
         
         elif request.method == 'POST':
-            # Get the form data sent in the POST request
             name = request.POST.get('name')
             description = request.POST.get('description')
             category = request.POST.get('category')
@@ -431,33 +403,27 @@ def edit_cocktail(request, cocktail_id):
             alcoholic = request.POST.get('alcoholic') == 'on'
             shared = request.POST.get('shared') == 'on'
 
-            # Handle Image Upload
             image_url = None
             if "image" in request.FILES:
-                image = request.FILES["image"]  # InMemoryUploadedFile
+                image = request.FILES["image"] 
                 
-                # Generate unique file path for storage
                 file_path = f"cocktail_images/{request.user.username}/{image.name}"
 
-                # Read file content and determine MIME type
                 file_content = image.read()
                 content_type = mimetypes.guess_type(image.name)[0] or "application/octet-stream"
 
                 try:
-                    # Upload to Supabase Storage
                     res = supabase.storage.from_("cocktail-images").upload(
                         path=file_path,
                         file=file_content,
                         file_options={"content-type": content_type}
                     )
 
-                    # Get Public URL of uploaded image
                     image_url = supabase.storage.from_("cocktail-images").get_public_url(file_path)
 
                 except Exception as e:
                     return JsonResponse({"error": f"Failed to upload image: {str(e)}"}, status=400)
 
-            # Handle ingredients and steps
             ingredients_names = request.POST.getlist('ingredients_name[]')
             ingredients_amounts = request.POST.getlist('ingredients_amount[]')
             ingredients_units = request.POST.getlist('ingredients_unit[]')
@@ -474,7 +440,6 @@ def edit_cocktail(request, cocktail_id):
             if not (len(ingredients_names) == len(ingredients_amounts) == len(ingredients_units) == len(ingredients_garnishes) == len(ingredients_optionals)):
                 return JsonResponse({'error': 'Mismatch in ingredient data lengths'}, status=400)
 
-            # Update the cocktail object
             cocktail.name = name
             cocktail.description = description
             cocktail.category = category
@@ -483,7 +448,6 @@ def edit_cocktail(request, cocktail_id):
             cocktail.shared = shared
             cocktail.image_url=image_url
 
-            # Clear existing ingredients and steps, then update
             cocktail.ingredients.clear()
             for i in range(len(ingredients_names)):
                 garnish = ingredients_garnishes[i] if isinstance(ingredients_garnishes[i], bool) else ingredients_garnishes[i].lower() in ["true", "1", "yes", "on"]
@@ -498,13 +462,12 @@ def edit_cocktail(request, cocktail_id):
                 )
                 cocktail.ingredients.add(ingredient)
 
-            # Clear and update the steps
             cocktail.steps.clear()
             for step_desc in steps:
                 step = Step.objects.create(description=step_desc)
                 cocktail.steps.add(step)
 
-            cocktail.save()  # Save the updated cocktail
+            cocktail.save()
 
             return JsonResponse({'message': 'Cocktail updated successfully'}, status=200)
 
@@ -514,7 +477,7 @@ def edit_cocktail(request, cocktail_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
-# Delete cocktail (only creator can delete)
+# Delete cocktail
 @login_required
 def delete_cocktail(request, cocktail_id):
     cocktail = get_object_or_404(Cocktail, id=cocktail_id, creator=request.user)
@@ -531,32 +494,28 @@ def signup_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Auto-login after signup
-            return redirect('browse')  # Change 'home' to your homepage
+            login(request, user)
+            return redirect('browse')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
 # Use the built-in LoginView for login
 class CustomLoginView(LoginView):
-    template_name = 'login.html'  # Make sure the path is correct
+    template_name = 'login.html'
     form_class = LoginForm
 
     def form_valid(self, form):
-        # Return to the usual page when login is successful
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        # Handling invalid login
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
         user = authenticate(username=username, password=password)
         
         if user is None:
-            # If no user is found with these credentials, add an error
             messages.error(self.request, "Invalid credentials. Please try again.")
 
-        # Return the form with errors back to the page
         return self.render_to_response(self.get_context_data(form=form))
 
 def logout_view(request):

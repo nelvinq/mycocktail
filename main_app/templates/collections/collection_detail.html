@@ -65,7 +65,7 @@
                 {% endif %}
               </div>
               <h2 class="card-title">{{ cocktail.name }}</h2>
-              <p><small>{{ cocktail.description }}</small></p>
+              <p class="card-description"><small>{{ cocktail.description }}</small></p>
               <p><strong>Category:</strong> {{ cocktail.category }}</p>
               <p><strong>Alcoholic:</strong> {% if cocktail.alcoholic %} Yes {% else %} No {% endif %}</p>
               <p><strong>Created by:</strong> {{ cocktail.creator }}</p>
@@ -85,17 +85,15 @@
         }
       function removeCocktail(cocktailId) {
           if (confirm("Are you sure you want to remove this cocktail?")) {
-              // Make a DELETE request to remove the cocktail
               fetch(`/collections/${cocktailId}/remove-cocktail`, {
                 method: 'DELETE',
                   headers: {
                       'Content-Type': 'application/json',
-                      'X-CSRFToken': '{{ csrf_token }}',  // CSRF token for security
+                      'X-CSRFToken': '{{ csrf_token }}',
                   },
               })
               .then(response => {
                   if (response.ok) {
-                      // On success, remove the cocktail card from the page
                       document.getElementById(`cocktail-${cocktailId}`).remove();
                   } else {
                       alert("Failed to remove cocktail.");
