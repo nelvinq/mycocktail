@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from django import forms
-from .models import Cocktail, Ingredient, Comment
+from .models import Cocktail, Ingredient, Comment, Collection
 from django.core.exceptions import ValidationError
 
 User = get_user_model()
@@ -24,24 +24,20 @@ class LoginForm(AuthenticationForm):
         username = cleaned_data.get("username")
         password = cleaned_data.get("password")
 
-        # Add custom validation if necessary
         if not username or not password:
             raise ValidationError("Both username and password are required.")
         return cleaned_data
 
 class CocktailForm(forms.ModelForm):
-    # Fields for Cocktail details
     name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Cocktail Name'}))
     description = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Cocktail Description'}), required=False)
     category = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'Category'}))
     glass_type = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'Glass Type'}))
-    alcoholic = forms.BooleanField(initial=True, required=False)  # Boolean to check if alcoholic or not
+    alcoholic = forms.BooleanField(initial=True, required=False)  
     shared = forms.BooleanField(initial=False, required=False)    
     
-    # Handling image upload
     image = forms.ImageField(required=False)
     
-    # Fields for ingredients and steps
     ingredient_name = forms.CharField(max_length=100, required=False)
     ingredient_amount = forms.CharField(max_length=100, required=False)
     ingredient_unit = forms.CharField(max_length=100, required=False)
@@ -54,7 +50,6 @@ class CocktailForm(forms.ModelForm):
         model = Cocktail
         fields = ['name', 'description', 'category', 'glass_type', 'alcoholic', 'image']
     
-    # Method to clean ingredients
     def clean_ingredients(self):
         ingredients = []
         for i in range(len(self.cleaned_data.get('ingredient_name', []))):
@@ -67,12 +62,8 @@ class CocktailForm(forms.ModelForm):
             })
         return ingredients
 
-    # Method to clean steps (could be extended as necessary)
     def clean_steps(self):
         return [step.strip() for step in self.cleaned_data.get('steps', '').split('\n') if step.strip()]
-
-from django import forms
-from .models import Collection
 
 class CollectionForm(forms.ModelForm):
     class Meta:

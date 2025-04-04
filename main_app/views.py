@@ -402,6 +402,12 @@ def edit_cocktail(request, cocktail_id):
             glass_type = request.POST.get('glass_type')
             alcoholic = request.POST.get('alcoholic') == 'on'
             shared = request.POST.get('shared') == 'on'
+            ingredients_names = request.POST.getlist('ingredients_name[]')
+            ingredients_amounts = request.POST.getlist('ingredients_amount[]')
+            ingredients_units = request.POST.getlist('ingredients_unit[]')
+            ingredients_garnishes = request.POST.getlist('ingredients_garnish[]')
+            ingredients_optionals = request.POST.getlist('ingredients_optional[]')
+            steps = request.POST.getlist('steps[]')
 
             image_url = None
             if "image" in request.FILES:
@@ -424,12 +430,14 @@ def edit_cocktail(request, cocktail_id):
                 except Exception as e:
                     return JsonResponse({"error": f"Failed to upload image: {str(e)}"}, status=400)
 
-            ingredients_names = request.POST.getlist('ingredients_name[]')
-            ingredients_amounts = request.POST.getlist('ingredients_amount[]')
-            ingredients_units = request.POST.getlist('ingredients_unit[]')
-            ingredients_garnishes = request.POST.getlist('ingredients_garnish[]')
-            ingredients_optionals = request.POST.getlist('ingredients_optional[]')
-            steps = request.POST.getlist('steps[]')
+
+            cocktail.name = name
+            cocktail.description = description
+            cocktail.category = category
+            cocktail.glass_type = glass_type
+            cocktail.alcoholic = alcoholic
+            cocktail.shared = shared
+            cocktail.image_url=image_url
 
             if len(ingredients_garnishes) < len(ingredients_names):
                 ingredients_garnishes.extend([False] * (len(ingredients_names) - len(ingredients_garnishes)))
@@ -439,14 +447,6 @@ def edit_cocktail(request, cocktail_id):
 
             if not (len(ingredients_names) == len(ingredients_amounts) == len(ingredients_units) == len(ingredients_garnishes) == len(ingredients_optionals)):
                 return JsonResponse({'error': 'Mismatch in ingredient data lengths'}, status=400)
-
-            cocktail.name = name
-            cocktail.description = description
-            cocktail.category = category
-            cocktail.glass_type = glass_type
-            cocktail.alcoholic = alcoholic
-            cocktail.shared = shared
-            cocktail.image_url=image_url
 
             cocktail.ingredients.clear()
             for i in range(len(ingredients_names)):
