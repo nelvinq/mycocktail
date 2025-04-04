@@ -55,7 +55,7 @@ Check out the deployed app here: **[MyCocktail Live](https://mycocktail.onrender
 ![Model](https://github.com/nelvinq/mycocktail/blob/9eca027278d5ccd5fde328497cd891094f04055c/main_app/static/images/wf6.jpg)
 
 ## 💻 Technologies Used  
-- **Frontend:** Django Templates, HTML, CSS, JavaScript, Font Awesome, jQuery
+- **Frontend:** Django Templates, HTML, CSS, JavaScript, Font Awesome, Sortables, jQuery
 - **Backend:** Django, PostgresSQL
 - **Authentication:** Django Authentication
 - **Deployment & Hosting:** Render (Frontend), SupaBase (Backend)  
