@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import signup_view, logout_view, home, about, cocktail_index, CustomLoginView,cocktail_detail, edit_cocktail, delete_cocktail, my_cocktails, my_collections, create_collection, edit_collection, add_to_collection, delete_collection, remove_cocktail, liked_cocktails
+from .views import signup_view, logout_view, home, about, CustomLoginView,cocktail_detail, edit_cocktail, delete_cocktail, my_cocktails, my_collections, create_collection, edit_collection, add_to_collection, delete_collection, remove_cocktail, liked_cocktails
 from django.contrib.auth.views import LoginView
 
 urlpatterns = [

@@ -57,23 +57,6 @@ def browse(request):
         'alcoholic_filter': alcoholic_filter,
     })
 
-# Cocktail index view
-def cocktail_index(request):
-    search_query = request.GET.get('search', '')
-    category_filter = request.GET.get('category', '')
-    alcoholic_filter = request.GET.get('alcoholic', '')
-
-    cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
-    shared_cocktails = cocktails.filter(shared=True)
-
-    return render(request, 'cocktails/browse.html', {
-        'cocktails': shared_cocktails,
-        'search_query': search_query,
-        'category_filter': category_filter,
-        'alcoholic_filter': alcoholic_filter,
-    })
-    
-
 # User Cocktail index view
 def my_cocktails(request):
     search_query = request.GET.get('search', '')
@@ -93,8 +76,19 @@ def my_cocktails(request):
 # Liked Cocktail index view
 @login_required
 def liked_cocktails(request):
-    liked_cocktails = Cocktail.objects.filter(likes=request.user)
-    return render(request, 'cocktails/liked_cocktails.html', {'liked_cocktails': liked_cocktails})
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    alcoholic_filter = request.GET.get('alcoholic', '')
+
+    cocktails = search_cocktails(search_query, category_filter, alcoholic_filter)
+    liked_cocktails = cocktails.filter(likes=request.user)
+
+    return render(request, 'cocktails/liked_cocktails.html', {
+        'liked_cocktails': liked_cocktails,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'alcoholic_filter': alcoholic_filter,
+    })
 
 # View Collection Details
 @login_required
